@@ -1,0 +1,127 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+<title>Scrum Table</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/redmond/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" >
+
+
+<style type="text/css">
+    body {font-size: 11px; padding: 0; background: darkgray;}
+    table { width: 100%;}
+    table th { border: 0px solid gray; width: 20%; height: 20px;}
+    table td { border: 1px dashed #aaa; vertical-align: top; padding: 5px;}
+
+    div.task {float: left; margin: 5px; padding: 5px 5px; border: 1px solid #aaa; background: #fffecb; display: inline-block; font-size: 11px; font-family: Helvetica,Arial,sans-serif;}
+    .over {border: 1px dashed red ;}
+    .tabContent {padding: 3px; background: #999;}
+    .round4 {border-radius: 4px; -moz-border-radius: 4px;}
+
+    div#sprintTitle {border-left: 1px solid black; background: #ddd; display: inline-block; margin: 5px; padding: 5px 5px; font-weight: bold;}
+</style>
+
+</head>
+<body>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-1">Table</a></li>
+        <li><a href="#tabs-2">Burn down chart</a></li>
+        <li><a href="#tabs-3">Sprints</a></li>
+    </ul>
+
+    <div id="tabs-1" class="tabContent">
+        <div class="helpers">
+            <button onclick="addNewTask();">+ Add new task</button>
+            <div id="sprintTitle">Sprint 1</div>
+        </div>
+        <table id="board" class="round4">
+            <tr><th>TODO</th><th>IN PROGRESS</th><th>COMMITED</th><th>READY FOR TEST</th><th>DONE</th></tr>
+            <tr>
+                <td id="todo" class="droppable"></td>
+                <td id="inProgress" class="droppable"></td>
+                <td id="commited" class="droppable"></td>
+                <td id="readyForTest" class="droppable"></td>
+                <td id="done" class="droppable"></td>
+            </tr>
+        </table>
+
+    </div>
+    <div id="tabs-2" class="tabContent">
+        chart
+    </div>
+    <div id="tabs-3" class="tabContent">
+    <button>+ Dodaj nowy sprint</button>
+    <ul>
+        <li>Sprint 1</li>
+    </ul>
+    </div>
+</div>
+</body>
+</html>
+
+<script>
+function setDraggable() {
+    $(".draggable").draggable({
+        stop: function(event, ui) {
+            $(this).css('top', 0);
+            $(this).css('left', 0);
+        }
+    });
+
+    $(".draggable").css('cursor', 'move');
+
+}
+
+function addNewTask() {
+    var taskHtml = '<div class="task round4 draggable"><b>estimation</b> - Double click to edit...</div>';
+    var task = $(taskHtml).appendTo('td#todo');
+
+    $(task).attr('id', 'task_' + generateId());
+
+    $(task).dblclick(function() {
+        $(this).draggable('option', 'disabled', true);
+        $(this).attr('contenteditable', true);
+        $(this).fadeTo('slow', 0.7);
+        $(this).css('border', '2px solid red');
+
+        $(this).blur(function () {
+            mpr('save changes');
+            $(this).draggable('option', 'disabled', false);
+            $(this).fadeTo('slow', 1);
+            $(this).css('border', '1px solid #aaa');
+        });
+
+        $(this).focus(function () {
+            mpr('edit');
+        });
+    });
+
+    setDraggable();
+}
+
+$(".droppable").droppable({
+    drop: function(event,ui) {
+        ui.helper.appendTo(this);
+        setDraggable();
+    }
+});
+
+
+function generateId() {
+    var date = new Date;
+    return Math.floor(Math.random() * 10000000) + '_' + date.getTime();
+}
+
+function mpr(value) {
+    console.log(value);
+}
+
+$(function() {
+    $( "#tabs" ).tabs();
+    setDraggable();
+    $("table#board").css('height', ($(window).height() - 120));
+});
+
+</script>

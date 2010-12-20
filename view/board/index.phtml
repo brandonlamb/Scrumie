@@ -1,0 +1,185 @@
+<?php
+$taskHelper = '<div class="task round4 draggable editable" id="%s">%s</div>';
+?>
+<div id="tabs">
+    <ul>
+        <li><a href="#tabs-3">Sprints</a></li>
+        <li><a href="#tabs-1">Board</a></li>
+        <li style="display: none"><a href="#tabs-2">Burn down chart</a></li>
+        <li style="display: none"><a href="#tabs-4">Queue</a></li>
+        <li><a href="#tabs-5">About</a></li>
+    </ul>
+
+    <div id="tabs-1" class="tabContent">
+        <div class="helpers">
+            <button onclick="addNewTask();">+ Add new task</button>
+            <div id="sprintTitle"><?= $this->sprintName; ?></div>
+        </div>
+        <table id="board" class="round4">
+            <tr><th>TODO</th><th>IN PROGRESS</th><th>COMMITED</th><th>READY FOR TEST</th><th>DONE</th></tr>
+            <tr>
+                <td id="todo" class="droppable">
+                <?php
+                    foreach($this->tasks['todo'] as $task) {
+                        echo sprintf($taskHelper, 1, $task);
+                    }
+                ?>
+                </td>
+                <td id="inProgress" class="droppable">
+                </td>
+                <td id="commited" class="droppable">
+                </td>
+                <td id="readyForTest" class="droppable">
+                </td>
+                <td id="done" class="droppable">
+                </td>
+            </tr>
+        </table>
+
+    </div>
+    <div id="tabs-2" class="tabContent">
+        chart
+    </div>
+    <div id="tabs-3" class="tabContent">
+    <button>+ Dodaj nowy sprint</button>
+    <ul>
+        <?php
+        foreach($this->sprints as $sprint) {
+            //xxx it cant be static content
+            echo sprintf('<li><a href="?controller=Board&sprint=%s"><b>%s</b></a><ul><li>someemail@gmail.com</li></ul></li>', $sprint->id_sprint, $sprint->name);
+        }
+        ?>
+    </ul>
+    </div>
+    <div id="tabs-4" class="tabContent">
+        <button>+ Add new task</button>
+    </div>
+    <div id="tabs-5" style="text-align: center" class="tabContent">
+        <h1>Scrumie</h1>
+    </div>
+</div>
+
+<div class="contextMenu" id="taskMenu">
+    <ul>
+        <li id="task_estimate">Estimate</li>
+        <li id="task_setOwner">Set owner</li>
+    </ul>
+</div>
+<script>
+function setDraggable() {
+    $(".draggable").draggable({
+        stop: function(event, ui) {
+            $(this).css('top', 0);
+            $(this).css('left', 0);
+        }
+    });
+
+    $(".draggable").css('cursor', 'move');
+}
+
+function setEditable() {
+
+    $.each($('.editable'), function(index, element) {
+        $(element).unbind();
+    });
+
+    $('.task').contextMenu("taskMenu", {
+        shadow: true, 
+        bindings: {
+            'task_estimate': function(t) {
+                var value = prompt('Please enter estimation value');
+
+                if(value === null)
+                    return;
+
+                if( value.match(/[^0-9]+/) )
+                    alert('Estimation must be number');
+                else
+                    $(t).children('span.estimation').html(value);
+
+                saveTask(t);
+            },
+            'task_setOwner': function(t) {
+                var value = prompt('Please enter onwer');
+
+                if(value === null)
+                    return;
+
+                $(t).children('span.owner').html(value);
+
+                saveTask(t);
+            },
+        }
+    });
+
+    $.each($('.editable'), function(index, element) {
+        $(element).dblclick(function() {
+            $(this).parent().draggable('option', 'disabled', true);
+            $(this).attr('contenteditable', true);
+            $(this).parent().fadeTo('slow', 0.9);
+            $(this).css('border', '2px solid red');
+            $(this).focus();
+
+            $(this).blur(function () {
+                mpr('save');
+                saveTask($(this).parent());
+            });
+
+            $(this).focus(function () {
+                mpr('edit');
+            });
+        });
+    });
+}
+
+function saveTask(task) {
+    $(task).draggable('option', 'disabled', false);
+    $(task).fadeTo('slow', 1);
+    var content = $(task).children('div.editable');
+    $(content).attr('contenteditable', false);
+    $(content).css('border', '0');
+
+    var params = {
+        taskId: $(task).attr('id'),
+        body: $(content).html(),
+        estimation: $(task).children('span.estimation').html(),
+        owner: $(task).children('span.owner').html(),
+        sprintId: $.getUrlVar('sprint')
+    };
+
+    $.post('?controller=Board&action=saveTask', params, function(data, status, Request) {
+        if(data)
+            $(task).attr('id', data)
+        else
+            alert('Problem with saving data');
+    });
+}
+
+function addNewTask() {
+    var taskHtml = '<div id="" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation"></span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
+    var task = $(taskHtml).appendTo('td#todo');
+    setEditable();
+    setDraggable();
+}
+
+$(".droppable").droppable({
+    drop: function(event,ui) {
+        ui.helper.appendTo(this);
+        setDraggable();
+    }
+});
+
+$(function() {
+    $( "#tabs" ).tabs();
+
+    if($.getUrlVar('sprint')) //select board tab when sprint selected
+        $( "#tabs" ).tabs({ selected: 1 });
+
+    setDraggable();
+    setEditable();
+    $("table#board").css('height', ($(window).height() - 120));
+    $(".droppable").disableTextSelect();
+
+});
+
+</script>

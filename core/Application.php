@@ -34,4 +34,12 @@ class Application {
     {
         return $this->FrontController->dispatch($controller, $action);
     }
+
+    public function getRequest() {
+        return $this->FrontController->Request;
+    }
+
+    public function isAjaxRequest() {
+        return $this->FrontController->Request->isAjax();
+    }
 }

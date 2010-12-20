@@ -3,8 +3,8 @@
 require_once 'Request.php';
 
 class FrontController {
-    protected $Request;
-    protected $controlers_dir = './controllers/';
+    public $Request;
+    public $controlers_dir = './controllers/';
 
     public function __construct() {
         $this->Request = new Request;
@@ -25,7 +25,7 @@ class FrontController {
 
         require_once($this->controlers_dir.$controller_name.'.php');
 
-        $ControllerCalled = new $controller_name($action);
+        $ControllerCalled = new $controller_name();
 
         if(!$ControllerCalled instanceof Controller)
             throw new Exception(sprintf('Controller %s must be instanceof Controller', $controller_name));

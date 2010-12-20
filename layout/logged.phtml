@@ -1,0 +1,37 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta content="text/html; charset=UTF-8" http-equiv="content-type"/>
+<title>Scrumie</title>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.4/jquery.min.js"></script>
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.7/jquery-ui.min.js"></script>
+<script type="text/javascript" src="./layout/scrumie.js"></script>
+<script type="text/javascript" src="./layout/jquery.contextmenu.js"></script>
+<link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/redmond/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" >
+
+<style type="text/css">
+    body {font-size: 11px; padding: 0; background: darkgray;}
+    table { width: 100%;}
+    table th { border: 0px solid gray; width: 20%; height: 20px;}
+    table td { border: 1px dashed #aaa; vertical-align: top; padding: 5px;}
+
+    div.task {float: left; margin: 5px; border: 1px solid #aaa; background: #fffecb; display: inline-block; font-size: 11px; font-family: Helvetica,Arial,sans-serif;}
+    div.task span {background: #ddd; padding-left: 2px; padding-right: 2px;}
+
+    div.editable {padding: 5px 5px;}
+    .over {border: 1px dashed red ;}
+    .tabContent {padding: 3px; background: #999;}
+    .round4 {border-radius: 4px; -moz-border-radius: 4px;}
+
+    div#conmenu {background: #ddd; border: 1px solid gray;}
+    div#conmenu div {background: #fff; margin: 2px; padding: 5px;}
+
+    div.estimation {background: #ddd; font-weight: bold; padding: 0; padding-left: 2px; padding-right: 2px}
+    div#sprintTitle {border-left: 1px solid black; background: #ddd; display: inline-block; margin: 5px; padding: 5px 5px; font-weight: bold;}
+</style>
+
+</head>
+<body>
+<?= $this->content; ?>
+</body>
+</html>

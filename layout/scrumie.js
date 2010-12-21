@@ -81,6 +81,7 @@ function generateId() {
 }
 
 function mpr(value) {
-    console.log(value);
+    if(typeof(console) !== 'undefined')
+        console.log(value);
 }
 

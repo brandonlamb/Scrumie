@@ -1,5 +1,8 @@
 <?php
-
+/**
+ * @copyright Roman Nowicki <peengle@gmail.com>
+ * @licence Free as a bird
+ */
 require_once ('core/Application.php');
 require_once('./lib/ScrumieController.php');
 session_start();

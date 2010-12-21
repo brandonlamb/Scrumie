@@ -1,3 +1,8 @@
 SCRUMIE
 ------------------------------
-Scrum table 
+Its very simple implementation of scrum board, it can help you with task managment in sprint
+when you don't have access to physical board or you work online.
+
+requirements: 
+ * PHP 5.3+
+ * http server (eg Apache)

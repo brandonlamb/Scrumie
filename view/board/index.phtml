@@ -1,5 +1,15 @@
 <?php
-$taskHelper = '<div class="task round4 draggable editable" id="%s">%s</div>';
+function prepareTask(stdClass $task) {
+    $taskHelper = '
+        <div id="%s" class="task round4 draggable">
+            <div class="editable body">%s</div>
+            <span title="Estimation" class="estimation">%s</span>
+            &nbsp;
+            <span class="owner" title="Owner" style="float: right;">%s</span>
+        </div>';
+
+    return sprintf($taskHelper, $task->id_task, $task->body, $task->estimation, $task->owner);
+}
 ?>
 <div id="tabs">
     <ul>
@@ -21,17 +31,37 @@ $taskHelper = '<div class="task round4 draggable editable" id="%s">%s</div>';
                 <td id="todo" class="droppable">
                 <?php
                     foreach($this->tasks['todo'] as $task) {
-                        echo sprintf($taskHelper, 1, $task);
+                        echo prepareTask($task);
                     }
                 ?>
                 </td>
                 <td id="inProgress" class="droppable">
+                <?php
+                    foreach($this->tasks['inProgress'] as $task) {
+                        echo prepareTask($task);
+                    }
+                ?>
                 </td>
                 <td id="commited" class="droppable">
+                <?php
+                    foreach($this->tasks['commited'] as $task) {
+                        echo prepareTask($task);
+                    }
+                ?>
                 </td>
                 <td id="readyForTest" class="droppable">
+                <?php
+                    foreach($this->tasks['readyForTest'] as $task) {
+                        echo prepareTask($task);
+                    }
+                ?>
                 </td>
                 <td id="done" class="droppable">
+                <?php
+                    foreach($this->tasks['done'] as $task) {
+                        echo prepareTask($task);
+                    }
+                ?>
                 </td>
             </tr>
         </table>
@@ -46,7 +76,7 @@ $taskHelper = '<div class="task round4 draggable editable" id="%s">%s</div>';
         <?php
         foreach($this->sprints as $sprint) {
             //xxx it cant be static content
-            echo sprintf('<li><a href="?controller=Board&sprint=%s"><b>%s</b></a><ul><li>someemail@gmail.com</li></ul></li>', $sprint->id_sprint, $sprint->name);
+            echo sprintf('<li><a href="?controller=Board&sprint=%s"><b>%s</b></a></li>', $sprint->id_sprint, $sprint->name);
         }
         ?>
     </ul>
@@ -63,6 +93,8 @@ $taskHelper = '<div class="task round4 draggable editable" id="%s">%s</div>';
     <ul>
         <li id="task_estimate">Estimate</li>
         <li id="task_setOwner">Set owner</li>
+        <li><hr/></li>
+        <li id="task_delete">Delete</li>
     </ul>
 </div>
 <script>
@@ -109,6 +141,15 @@ function setEditable() {
 
                 saveTask(t);
             },
+            'task_delete': function(t) {
+                if (! confirm('Are you sure you want to delete this task') )
+                    return;
+
+                $.post('?controller=Board&action=deleteTask', {taskId: $(t).attr('id')}, function(data, status, Request) {
+                        if(data)
+                            $(t).remove();
+                });
+            },
         }
     });
 
@@ -144,7 +185,8 @@ function saveTask(task) {
         body: $(content).html(),
         estimation: $(task).children('span.estimation').html(),
         owner: $(task).children('span.owner').html(),
-        sprintId: $.getUrlVar('sprint')
+        sprintId: $.getUrlVar('sprint'),
+        state: $(task).parent().attr('id')
     };
 
     $.post('?controller=Board&action=saveTask', params, function(data, status, Request) {
@@ -164,8 +206,10 @@ function addNewTask() {
 
 $(".droppable").droppable({
     drop: function(event,ui) {
+        mpr('drop');
         ui.helper.appendTo(this);
         setDraggable();
+        saveTask(ui.helper);
     }
 });
 
@@ -178,7 +222,7 @@ $(function() {
     setDraggable();
     setEditable();
     $("table#board").css('height', ($(window).height() - 120));
-    $(".droppable").disableTextSelect();
+    //$(".droppable").disableTextSelect();
 
 });
 

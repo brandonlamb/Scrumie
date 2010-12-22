@@ -32,6 +32,10 @@
         $('div#registryDialog input[type|="submit"]').click(function() {
             var formData = $('form#registryForm').serializeArray();
             $.post('?controller=User&action=registry', formData, function(data, textStatus, Request) {
+                if(data === true)
+                    location.href = '?controller=Index';
+                else
+                    alert(data);
             });
         });
 

@@ -4,12 +4,12 @@ class UserController extends ScrumieController
 {
     public function registryAction() {
        $serviceUser = $this->getService('User');
-
+       try {
        $serviceUser->registryUser($this->_getParam('email'), $this->_getParam('password'));
-       $this->result = array('ok'); 
-
-       $this->_forward('User', 'login');
-
+       $this->result = true;
+       } catch (Exception $e) {
+           $this->result = $e->getMessage();
+       }
     }
 
     public function loginAction() {

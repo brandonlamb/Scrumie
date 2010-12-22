@@ -13,7 +13,7 @@ class Database
     }
 
     public function lastInsertId() {
-        return $this->db->lastInsertRowID();
+        return $this->db->lastInsertId();
     }
 
     static public function checkDatabaseConnection() {

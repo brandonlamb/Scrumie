@@ -4,8 +4,8 @@ class Database
 {
     private $db;
 
-    public function __construct($dbname) {
-        $this->db = new SQLite3($dbname);
+    public function __construct() {
+        $this->db = new PDO('sqlite:'.DATABASE);
     }
 
     public function query($sql) {
@@ -14,5 +14,19 @@ class Database
 
     public function lastInsertId() {
         return $this->db->lastInsertRowID();
+    }
+
+    static public function checkDatabaseConnection() {
+        if(! class_exists('PDO'))
+            throw new RuntimeException('Missing PDO class');
+
+        if(! is_file(DATABASE))
+            throw new RuntimeException(sprintf('Missing %s database file', DATABASE));
+
+        if(! is_readable(DATABASE))
+            throw new RuntimeException(sprintf('Database %s file is not readable', DATABASE));
+
+        if(! is_writable(DATABASE))
+            throw new RuntimeException(sprintf('Database %s file is not writeable', DATABASE));
     }
 }

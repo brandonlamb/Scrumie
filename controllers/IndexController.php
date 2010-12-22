@@ -5,5 +5,6 @@ class IndexController extends ScrumieController {
     protected $layout = 'default.phtml';
 
     public function indexAction() {
+        Database::checkDatabaseConnection();
     }
 }

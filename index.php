@@ -5,6 +5,8 @@
  */
 require_once ('core/Application.php');
 require_once('./lib/ScrumieController.php');
+require_once('./lib/Database.php');
+define('DATABASE', 'data/scrumie.sqlite');
 session_start();
 $App = Application::getInstance();
 

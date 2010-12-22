@@ -69,10 +69,7 @@ abstract class DataModel implements ActiveRecordInterface
     static protected function fetch($sql) {
         $result = self::query($sql);
 
-        $data = array();
-        while($res = $result->fetchArray(SQLITE3_ASSOC)) {
-            $data[] = (object) $res;
-        }
+        $data = $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
 
         return $data;
     }
@@ -85,16 +82,7 @@ abstract class DataModel implements ActiveRecordInterface
     }
 
     static private function _initDatabase() {
-        require_once('./lib/Database.php');
-        $dbfile = realpath('./data/scrumie.sqlite');
-
-        if(! is_file($dbfile))
-            throw new RuntimeException('Missing database file');
-
-        if(! is_readable($dbfile))
-            throw new RuntimeException('Database file is not readeable');
-
-        self::$_db = new Database($dbfile);
+        self::$_db = new Database();
     }
 
     public function __set($name, $value) {

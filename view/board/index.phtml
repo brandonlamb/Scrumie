@@ -5,10 +5,12 @@ function prepareTask(stdClass $task) {
             <div class="editable body">%s</div>
             <span title="Estimation" class="estimation">%s</span>
             &nbsp;
+            <span title="Done" class="done">%s</span>
+            &nbsp;
             <span class="owner" title="Owner" style="float: right;">%s</span>
         </div>';
 
-    return sprintf($taskHelper, $task->id_task, $task->body, $task->estimation, $task->owner);
+    return sprintf($taskHelper, $task->id_task, $task->body, $task->estimation, $task->done, $task->owner);
 }
 ?>
 <div id="tabs">
@@ -92,6 +94,7 @@ function prepareTask(stdClass $task) {
 <div class="contextMenu" id="taskMenu">
     <ul>
         <li id="task_estimate">Estimate</li>
+        <li id="task_done">Set done</li>
         <li id="task_setOwner">Set owner</li>
         <li><hr/></li>
         <li id="task_delete">Delete</li>
@@ -128,6 +131,19 @@ function setEditable() {
                     alert('Estimation must be number');
                 else
                     $(t).children('span.estimation').html(value);
+
+                saveTask(t);
+            },
+            'task_done': function(t) {
+                var value = prompt('Please enter value');
+
+                if(value === null)
+                    return;
+
+                if( value.match(/[^0-9]+/) )
+                    alert('It must be number');
+                else
+                    $(t).children('span.done').html(value);
 
                 saveTask(t);
             },
@@ -184,6 +200,7 @@ function saveTask(task) {
         taskId: $(task).attr('id'),
         body: $(content).html(),
         estimation: $(task).children('span.estimation').html(),
+        done: $(task).children('span.done').html(),
         owner: $(task).children('span.owner').html(),
         sprintId: $.getUrlVar('sprint'),
         state: $(task).parent().attr('id')

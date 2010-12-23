@@ -19,8 +19,9 @@ class BoardController extends ScrumieController {
         $estimation = $this->_getParam('estimation');
         $owner = $this->_getParam('owner');
         $state = $this->_getParam('state');
+        $done = $this->_getParam('done');
 
-        $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state);
+        $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done);
 
         $this->result = $task->getId();
     }

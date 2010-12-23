@@ -25,7 +25,7 @@ class TaskService extends Service
         );
     }
 
-    public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state) {
+    public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done) {
         $task = new Task();
         $task->id_sprint = $sprintId;
         $task->id_task = $taskId;
@@ -33,6 +33,7 @@ class TaskService extends Service
         $task->estimation = $estimation;
         $task->owner = $owner;
         $task->state = $state;
+        $task->done = $done;
 
         if($taskId)
             $task->update();

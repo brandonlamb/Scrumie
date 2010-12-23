@@ -25,6 +25,7 @@ class Task extends DataModel
         'id_sprint' => null,
         'owner' => null,
         'state' => null,
+        'done' => null,
     );
 
     const _CLASS_ = __CLASS__;

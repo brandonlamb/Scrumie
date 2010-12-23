@@ -71,12 +71,12 @@ function prepareTask(stdClass $task) {
         chart
     </div>
     <div id="tabs-3" class="tabContent">
-    <button>+ Dodaj nowy sprint</button>
-    <ul>
+    <button onclick="addNewSprint()">+ Add new sprint</button>
+    <ul id="sprints-list">
         <?php
         foreach($this->sprints as $sprint) {
             //xxx it cant be static content
-            echo sprintf('<li><a href="?controller=Board&sprint=%s"><b>%s</b></a></li>', $sprint->id_sprint, $sprint->name);
+            echo sprintf('<li><a href="?controller=Board&sprint=%s">%s</a></li>', $sprint->id_sprint, $sprint->name);
         }
         ?>
     </ul>
@@ -202,6 +202,27 @@ function addNewTask() {
     var task = $(taskHtml).appendTo('td#todo');
     setEditable();
     setDraggable();
+}
+
+function addNewSprint() {
+    var sprintName = prompt('Sprint name');
+
+    if(sprintName == null)
+        return
+
+    if(sprintName == '') {
+        alert('Sprint name can\'t be empty');
+        addNewSprint();
+    }
+    else
+    {
+        $.post('?controller=Board&action=addNewSprint', {'sprintName': sprintName}, function(data, status, Request) {
+            if(isNaN(parseInt(data)))
+                alert(data)
+            else
+                location.href = '?controller=Board';
+        });
+    }
 }
 
 $(".droppable").droppable({

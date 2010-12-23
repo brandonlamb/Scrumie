@@ -11,4 +11,12 @@ class SprintService extends Service
         return Sprint::getById($id);
     }
 
+    public function addNewSprint($sprintName) {
+        $sprint = new Sprint();
+        $sprint->name = $sprintName;
+        $sprint->id_sprint = $sprint->insert();
+
+        return $sprint;
+    }
+
 }

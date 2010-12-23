@@ -32,4 +32,10 @@ class BoardController extends ScrumieController {
 
         $this->result = true;
     }
+
+    public function addNewSprintAction() {
+        $sprintName = $this->_getParam('sprintName');
+        $sprint = $this->getService('Sprint')->addNewSprint($sprintName);
+        $this->result = $sprint->getId();
+    }
 }

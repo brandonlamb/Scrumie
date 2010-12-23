@@ -5,7 +5,7 @@ class UserController extends ScrumieController
     public function registryAction() {
        $serviceUser = $this->getService('User');
        try {
-       $serviceUser->registryUser($this->_getParam('email'), $this->_getParam('password'));
+       $serviceUser->registryUser($this->_getParam('login'), $this->_getParam('password'));
        $this->result = true;
        } catch (Exception $e) {
            $this->result = $e->getMessage();
@@ -13,13 +13,13 @@ class UserController extends ScrumieController
     }
 
     public function loginAction() {
-        $email = $this->_getParam('email');
+        $login = $this->_getParam('login');
         $password = $this->_getParam('password');
 
-        if(! $this->getService('User')->authorize($email, $password))
-            throw new Exception('Invalid email or password');
+        if(! $this->getService('User')->authorize($login, $password))
+            throw new Exception('Invalid login or password');
 
-        $_SESSION['userLogged'] = $email;
+        $_SESSION['userLogged'] = $login;
 
         $this->result = true;
     }

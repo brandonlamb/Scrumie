@@ -5,7 +5,7 @@ class User extends DataModel
 {
     protected $data = array(
         'id_user' => null,
-        'email' => null,
+        'login' => null,
         'password' => null,
     );
 
@@ -13,13 +13,13 @@ class User extends DataModel
     const TABLE = 'user';
     const INDEX = 'id_user';
 
-    static public function isRegistered($email) {
-        $result = self::fetch(sprintf("SELECT id_user FROM user WHERE email = '%s' LIMIT 1", $email));
+    static public function isRegistered($login) {
+        $result = self::fetch(sprintf("SELECT id_user FROM user WHERE login = '%s' LIMIT 1", $login));
         return ($result) ? true : false;
     }
 
-    static public function authorize($email, $password) {
-        $result = self::fetch(sprintf("SELECT id_user FROM user WHERE email = '%s' and password = '%s' LIMIT 1", $email, md5($password)));
+    static public function authorize($login, $password) {
+        $result = self::fetch(sprintf("SELECT id_user FROM user WHERE login = '%s' and password = '%s' LIMIT 1", $login, md5($password)));
         return ($result) ? true : false;
     }
 }

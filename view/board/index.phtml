@@ -13,16 +13,19 @@ function prepareTask(stdClass $task) {
     return sprintf($taskHelper, $task->id_task, $task->body, $task->estimation, $task->done, $task->owner);
 }
 ?>
+
+
 <div id="tabs">
     <ul>
-        <li><a href="#tabs-3">Sprints</a></li>
-        <li><a href="#tabs-1">Board</a></li>
-        <li style="display: none"><a href="#tabs-2">Burn down chart</a></li>
-        <li style="display: none"><a href="#tabs-4">Queue</a></li>
-        <li><a href="#tabs-5">About</a></li>
+        <li><a href="#tabs-sprints">Sprints</a></li>
+        <li><a href="#tabs-board">Board</a></li>
+        <li style="display: none"><a href="#tabs-burndownchart">Burn down chart</a></li>
+        <li style="display: none"><a href="#tabs-backlog">Backlog</a></li>
+        <li><a href="#tabs-about">About</a></li>
     </ul>
 
-    <div id="tabs-1" class="tabContent">
+
+    <div id="tabs-board" class="tabContent">
         <div class="helpers">
             <button onclick="addNewTask();">+ Add new task</button>
             <div id="sprintTitle"><?= $this->sprintName; ?></div>
@@ -69,31 +72,33 @@ function prepareTask(stdClass $task) {
         </table>
 
     </div>
-    <div id="tabs-2" class="tabContent">
-        chart
-    </div>
-    <div id="tabs-3" class="tabContent">
+
+    <div id="tabs-sprints" class="tabContent">
     <button onclick="addNewSprint()">+ Add new sprint</button>
     <ul id="sprints-list">
         <?php
         foreach($this->sprints as $sprint) {
-            //xxx it cant be static content
             echo sprintf('<li><a href="?controller=Board&sprint=%s">%s</a></li>', $sprint->id_sprint, $sprint->name);
         }
         ?>
     </ul>
     </div>
-    <div id="tabs-4" class="tabContent">
-        <button>+ Add new task</button>
-    </div>
-    <div id="tabs-5" style="text-align: center" class="tabContent">
+
+    <div id="tabs-about" style="text-align: center" class="tabContent">
         <h1>Scrumie</h1>
         <p>
         Copyright &copy; 2010 Roman Nowicki
         </p>
     </div>
+
+    <div id="tabs-burndownchart" class="tabContent">
+    </div>
+
+    <div id="tabs-backlog" class="tabContent">
+    </div>
 </div>
 
+<!-- task context menu -->
 <div class="contextMenu" id="taskMenu">
     <ul>
         <li id="task_estimate">Estimate</li>
@@ -103,6 +108,7 @@ function prepareTask(stdClass $task) {
         <li id="task_delete">Delete</li>
     </ul>
 </div>
+
 <script>
 function setDraggable() {
     $(".draggable").draggable({
@@ -179,6 +185,9 @@ function setEditable() {
             $(this).parent().fadeTo('slow', 0.9);
             $(this).css('border', '2px solid red');
             $(this).focus();
+
+            $(this).unbind('blur');
+            $(this).unbind('focus');
 
             $(this).blur(function () {
                 mpr('save');
@@ -263,7 +272,6 @@ $(function() {
     setDraggable();
     setEditable();
     $("table#board").css('height', ($(window).height() - 120));
-    //$(".droppable").disableTextSelect();
 
 });
 

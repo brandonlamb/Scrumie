@@ -31,7 +31,48 @@ function prepareTask(stdClass $task) {
             <div id="sprintTitle"><?= $this->sprintName; ?></div>
         </div>
         <table id="board" class="round4">
-            <tr><th>TODO</th><th>IN PROGRESS</th><th>COMMITED</th><th>READY FOR TEST</th><th>DONE</th></tr>
+            <tr>
+                <th>
+                    TODO
+                    <div class="summary">
+                        <span id="todo-sum-done">0</span>
+                        /
+                        <span id="todo-sum-estimation">0</span>
+                    </div>
+                </th>
+                <th>
+                    IN PROGRESS
+                    <div class="summary">
+                        <span id="inProgress-sum-done">0</span>
+                        /
+                        <span id="inProgress-sum-estimation">0</span>
+                    </div>
+                </th>
+                <th>
+                    COMMITED
+                    <div class="summary">
+                        <span id="commited-sum-done">0</span>
+                        /
+                        <span id="commited-sum-estimation">0</span>
+                    </div>
+                </th>
+                <th>
+                    READY FOR TEST
+                    <div class="summary">
+                        <span id="readyForTest-sum-done">0</span>
+                        /
+                        <span id="readyForTest-sum-estimation">0</span>
+                    </div>
+                </th>
+                <th>
+                    DONE
+                    <div class="summary">
+                        <span id="done-sum-done">0</span>
+                        /
+                        <span id="done-sum-estiamation">0</span>
+                    </div>
+                </th>
+            </tr>
             <tr>
                 <td id="todo" class="droppable">
                 <?php
@@ -224,6 +265,8 @@ function saveTask(task) {
         else
             alert('Problem with saving data');
     });
+
+    updateSummary();
 }
 
 function addNewTask() {
@@ -263,6 +306,28 @@ $(".droppable").droppable({
     }
 });
 
+
+function updateSummary() {
+    $.each($('table#board td'), function(index,element) {
+        var column = $(element).attr('id');
+
+        var summaryEstimation = 0;
+        $.each($(element).children('div.task').children('span.estimation'), function(i, e) {
+            summaryEstimation += getAsNumber($(e).html());
+        });
+
+        $('span#' + column + '-sum-estimation').html(summaryEstimation);
+
+        var summaryDone = 0;
+        $.each($(element).children('div.task').children('span.done'), function(i, e) {
+            summaryDone += getAsNumber($(e).html());
+        });
+
+        $('span#' + column + '-sum-done').html(summaryDone);
+    });
+}
+
+
 $(function() {
     $( "#tabs" ).tabs();
 
@@ -272,6 +337,8 @@ $(function() {
     setDraggable();
     setEditable();
     $("table#board").css('height', ($(window).height() - 120));
+
+    updateSummary();
 
 });
 

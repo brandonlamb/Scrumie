@@ -85,3 +85,12 @@ function mpr(value) {
         console.log(value);
 }
 
+function getAsNumber(value) {
+    if(isNaN(value))
+        return 0;
+
+    if(value == '')
+        return 0;
+
+    return parseFloat(value);
+}

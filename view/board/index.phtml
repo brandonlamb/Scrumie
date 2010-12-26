@@ -1,5 +1,12 @@
 <?php
 function prepareTask(stdClass $task) {
+
+    if($task->estimation === null)
+        $task->estimation = 1;
+
+    if($task->done === null)
+        $task->done = 0;
+
     $taskHelper = '
         <div id="%s" class="task round4 draggable">
             <div class="editable body">%s</div>
@@ -270,7 +277,7 @@ function saveTask(task) {
 }
 
 function addNewTask() {
-    var taskHtml = '<div id="" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation"></span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
+    var taskHtml = '<div id="" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation">1</span>&nbsp;<span class="done">0</span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
     var task = $(taskHtml).appendTo('td#todo');
     setEditable();
     setDraggable();

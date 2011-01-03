@@ -35,6 +35,7 @@ function prepareTask(stdClass $task) {
     <div id="tabs-board" class="tabContent">
         <div class="helpers">
             <button onclick="addNewTask();">+ Add new task</button>
+            <button onclick="addToBurnChart();">+ Add today result to burnchart</button>
             <div id="sprintTitle"><?= $this->sprintName; ?></div>
         </div>
         <table id="board" class="round4">
@@ -315,6 +316,13 @@ $(".droppable").droppable({
 
 
 function updateSummary() {
+    var summary = [];
+    summary['todo'] = {all: 0, done: 0};
+    summary['inProgress'] = {all: 0, done: 0};
+    summary['commited'] = {all: 0, done: 0};
+    summary['readyForTest'] = {all: 0, done: 0};
+    summary['done'] = {all: 0, done: 0};
+
     $.each($('table#board td'), function(index,element) {
         var column = $(element).attr('id');
 
@@ -323,15 +331,30 @@ function updateSummary() {
             summaryEstimation += getAsNumber($(e).html());
         });
 
-        $('span#' + column + '-sum-estimation').html(summaryEstimation);
-
         var summaryDone = 0;
         $.each($(element).children('div.task').children('span.done'), function(i, e) {
             summaryDone += getAsNumber($(e).html());
         });
 
-        $('span#' + column + '-sum-done').html(summaryDone);
+        summary[column].all = summaryEstimation;
+        summary[column].done = summaryDone;
+
     });
+
+    $('span#todo-sum-estimation').html(summary['todo'].all);
+    $('span#todo-sum-done').html(summary['todo'].done);
+
+    $('span#inProgress-sum-estimation').html(summary['todo'].all + summary['inProgress'].all);
+    $('span#inProgress-sum-done').html(summary['inProgress'].done);
+    
+    $('span#commited-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all);
+    $('span#commited-sum-done').html(summary['commited'].done);
+
+    $('span#readyForTest-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all + summary['readyForTest'].all);
+    $('span#readyForTest-sum-done').html(summary['readyForTest'].done);
+
+    $('span#done-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all + summary['readyForTest'].all + summary['done'].all);
+    $('span#done-sum-done').html(summary['done'].done);
 }
 
 

@@ -6,6 +6,8 @@ class Sprint extends DataModel
     protected $data = array(
         'id_sprint' => null,
         'name' => null,
+        'startdate' => null,
+        'estimation' => null,
     );
 
     const _CLASS_ = __CLASS__;

@@ -7,7 +7,6 @@ class Sprint extends DataModel
         'id_sprint' => null,
         'name' => null,
         'startdate' => null,
-        'estimation' => null,
     );
 
     const _CLASS_ = __CLASS__;

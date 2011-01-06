@@ -1,8 +1,14 @@
 <?php
 /**
  * @copyright Roman Nowicki <peengle@gmail.com>
- * @licence Free as a bird
+ * @licence GNU General Public Licence
+ * http://scrumie.cjb.net
  */
+if(! is_readable('./data'))
+    die('./data directory is not readable');
+if(! is_writable('./data'))
+    die('./data directory is not writable');
+
 require_once ('core/Application.php');
 require_once('./lib/ScrumieController.php');
 require_once('./lib/Database.php');

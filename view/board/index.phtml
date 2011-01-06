@@ -26,8 +26,8 @@ function prepareTask(stdClass $task) {
     <ul>
         <li><a href="#tabs-sprints">Sprints</a></li>
         <li><a href="#tabs-board">Board</a></li>
-        <li style="display: none"><a href="#tabs-burndownchart">Burn down chart</a></li>
-        <li style="display: none"><a href="#tabs-backlog">Backlog</a></li>
+        <li><a href="#tabs-burndownchart">Burn down chart</a></li>
+        <li><a href="#tabs-backlog">Backlog</a></li>
         <li><a href="#tabs-about">About</a></li>
     </ul>
 
@@ -35,7 +35,6 @@ function prepareTask(stdClass $task) {
     <div id="tabs-board" class="tabContent">
         <div class="helpers">
             <button onclick="addNewTask();">+ Add new task</button>
-            <button onclick="addToBurnChart();">+ Add today result to burnchart</button>
             <div id="sprintTitle"><?= $this->sprintName; ?></div>
         </div>
         <table id="board" class="round4">

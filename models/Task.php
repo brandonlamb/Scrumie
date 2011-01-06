@@ -42,4 +42,8 @@ class Task extends DataModel
 
         $this->data['state'] = $value;
     }
+
+    public function getHistory() {
+        return TaskHistory::fetchBy('task_id', $this->id_task);
+    }
 }

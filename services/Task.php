@@ -58,4 +58,11 @@ class TaskService extends Service
     public function deleteTask($taskId) {
         Task::getById($taskId)->delete();
     }
+
+    public function getTasksUpdateDates(array $tasks_ids) {
+        $dates = array();
+        foreach(DataModel::fetch(sprintf("select distinct date from task_history where id_task in (%s) order by date asc",join(',',$tasks_ids))) as $data)
+            $dates[] = $data->date;
+        return $dates;
+    }
 }

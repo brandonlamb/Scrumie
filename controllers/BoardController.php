@@ -10,6 +10,15 @@ class BoardController extends ScrumieController {
         $this->view->sprints = $this->getService('Sprint')->fetchAll();
         $this->view->tasks = $this->getService('Task')->fetchTaskForSprint($sprintId);
         $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : '-not selected-';
+
+        $this->view->btc_y_max = $this->getService('Sprint')->getSprintEstimation($sprintId) + 1;
+        $this->view->btc_series = join(',',$this->getService('Sprint')->getEstimationForEachSprintDate($sprintId));
+
+        $updates = array();
+        foreach($this->getService('Sprint')->getSprintUpdateDates($sprintId) as $date)
+            $updates[] = date('D/d/M', strtotime($date));
+
+        $this->view->btc_x_categories = '"'.join('","', $updates).'"';
     }
 
     public function saveTaskAction() {
@@ -22,7 +31,6 @@ class BoardController extends ScrumieController {
         $done = $this->_getParam('done');
 
         $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done);
-        $this->getService('Sprint')->estimateSprint($sprintId);
 
         $this->result = $task->getId();
     }

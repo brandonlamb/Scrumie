@@ -140,9 +140,45 @@ function prepareTask(stdClass $task) {
     </div>
 
     <div id="tabs-burndownchart" class="tabContent">
+    <button onclick="reloadBtc()">Redraw</button>
+    <div style="width: 90%" id="burndownchart-container"></div>
+    <script>
+        var chart;
+        $(document).ready(function() {
+           chart = new Highcharts.Chart({
+              chart: {
+                 renderTo: 'burndownchart-container'
+              },
+              xAxis: {
+                categories: [<?= $this->btc_x_categories?>]
+              },
+              yAxis: {
+                 title: {text: 'Estimation points'},
+                 min: 0,
+                 max: <?= $this->btc_y_max ?>,
+              },
+              title: {
+                 text: 'Burndown chart'
+              },
+              tooltip: { formatter: function() { return this.y +' points' } },
+              series: [{
+                 name: 'Points left',
+                 data: [<?= $this->btc_series ?>],
+                 marker: {
+                    radius: 4
+                 }
+              }]
+           });
+        });
+
+        function reloadBtc() {
+            location.href = location.href.replace(/&tab.*/, '') + '&tab=2';
+        }
+    </script>
     </div>
 
     <div id="tabs-backlog" class="tabContent">
+        to be continued...
     </div>
 </div>
 
@@ -360,7 +396,10 @@ function updateSummary() {
 $(function() {
     $( "#tabs" ).tabs();
 
-    if($.getUrlVar('sprint')) //select board tab when sprint selected
+    var tabIndex = parseInt($.getUrlVar('tab'));
+    if(tabIndex)
+        $( "#tabs" ).tabs({ selected: parseInt(tabIndex) });
+    else if($.getUrlVar('sprint')) 
         $( "#tabs" ).tabs({ selected: 1 });
 
     setDraggable();

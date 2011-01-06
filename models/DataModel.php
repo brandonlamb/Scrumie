@@ -66,21 +66,16 @@ abstract class DataModel implements ActiveRecordInterface
 
         $where = array();
 
-        foreach($columns as $key => $values) {
+        foreach($columns as $key => $values)
             $where[] = "$key = '$values'";
-        }
 
         $sql = sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where));
-
         $result = self::fetch(sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where)));
 
         $collection = array();
-
         $class = static::_CLASS_;
-
-        foreach($result as $data) {
+        foreach($result as $data)
             $collection[] = new $class($data);
-        }
 
         return $collection;
     }
@@ -89,18 +84,24 @@ abstract class DataModel implements ActiveRecordInterface
         return self::fetch(sprintf('SELECT * FROM %s', static::TABLE));
     }
 
-    static protected function fetch($sql) {
-        $result = self::query($sql);
+    static public function fetchOne($sql, $column = null) {
+        $result = self::fetch($sql);
 
-        $data = $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+        if(!$result)
+            return false;
 
-        return $data;
+        $class = static::_CLASS_;
+        return ($column) ? $result[0]->$column : new $class($result[0]);
     }
 
-    static protected function query($sql) {
+    static public function fetch($sql) {
+        $result = self::query($sql);
+        return $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+    }
+
+    static public function query($sql) {
         if(! self::$_db)
             self::_initDatabase();
-
         return self::$_db->query($sql);
     }
 

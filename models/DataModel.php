@@ -62,6 +62,29 @@ abstract class DataModel implements ActiveRecordInterface
         return self::fetch(sprintf("SELECT * FROM %s WHERE %s = '%s'", static::TABLE, $column, $value));
     }
 
+    static public function fetchByColumns(array $columns) {
+
+        $where = array();
+
+        foreach($columns as $key => $values) {
+            $where[] = "$key = '$values'";
+        }
+
+        $sql = sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where));
+
+        $result = self::fetch(sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where)));
+
+        $collection = array();
+
+        $class = static::_CLASS_;
+
+        foreach($result as $data) {
+            $collection[] = new $class($data);
+        }
+
+        return $collection;
+    }
+
     static public function fetchAll() {
         return self::fetch(sprintf('SELECT * FROM %s', static::TABLE));
     }

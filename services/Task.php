@@ -1,12 +1,11 @@
 <?php
 
 require_once ('./models/Task.php');
+require_once ('./models/TaskHistory.php');
 
 class TaskService extends Service
 {
     public function fetchTaskForSprint($sprintId) {
-
-
         $tasks['todo'] = array(); 
         $tasks['inProgress'] = array(); 
         $tasks['commited'] = array(); 
@@ -35,12 +34,25 @@ class TaskService extends Service
         $task->state = $state;
         $task->done = $done;
 
-        if($taskId)
+        if($taskId) 
             $task->update();
         else
             $task->id_task = $task->insert();
 
+        $this->saveToHistory($task);
+        
         return $task;
+    }
+
+    public function saveToHistory(Task $task) {
+        $today = date('Y-m-d 00:00:00', time());
+        $taskHistory = TaskHistory::getIfExistsOrCreateNewOne($task->id_task, $today);
+        $taskHistory->done = $task->done;
+
+        if($taskHistory->id)
+            $taskHistory->update();
+        else
+            $taskHistory->insert();
     }
 
     public function deleteTask($taskId) {

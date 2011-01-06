@@ -95,8 +95,9 @@ abstract class DataModel implements ActiveRecordInterface
     }
 
     static public function fetch($sql) {
-        $result = self::query($sql);
-        return $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+        if($result = self::query($sql))
+            return $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+        return array();
     }
 
     static public function query($sql) {

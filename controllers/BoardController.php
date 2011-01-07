@@ -10,7 +10,6 @@ class BoardController extends ScrumieController {
         $this->view->sprints = $this->getService('Sprint')->fetchAll();
         $this->view->tasks = $this->getService('Task')->fetchTaskForSprint($sprintId);
         $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : '-not selected-';
-
         $this->view->btc_y_max = $this->getService('Sprint')->getSprintEstimation($sprintId) + 1;
         $this->view->btc_series = join(',',$this->getService('Sprint')->getEstimationForEachSprintDate($sprintId));
 

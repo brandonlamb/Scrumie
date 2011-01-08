@@ -187,7 +187,11 @@ function prepareTask(stdClass $task) {
     </div>
 
     <div id="tabs-backlog" class="tabContent">
-        to be continued...
+        <button onclick="addNewTask();">+ Add new task</button>
+        <ol class="sortable" id="backlog-content">
+            <li><div title="Estimate" class="editable estimate-box">?</div><div class="editable">example 1</div></li>
+            <li><div title="Estimate" class="editable estimate-box">?</div><div class="editable">example 1</div></li>
+        </ol>
     </div>
 </div>
 
@@ -212,6 +216,10 @@ function setDraggable() {
     });
 
     $(".draggable").css('cursor', 'move');
+}
+
+function setSortable() {
+    $(".sortable").sortable();
 }
 
 function setEditable() {
@@ -413,6 +421,7 @@ $(function() {
 
     setDraggable();
     setEditable();
+    setSortable();
     $("table#board").css('height', ($(window).height() - 120));
 
     updateSummary();

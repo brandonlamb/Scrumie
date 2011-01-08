@@ -57,6 +57,11 @@ class TaskService extends Service
 
     public function deleteTask($taskId) {
         Task::getById($taskId)->delete();
+        $this->deleteTaskHistory($taskId);
+    }
+
+    public function deleteTaskHistory($taskId) {
+        DataModel::query("DELETE FROM task_history WHERE id_task = $taskId");
     }
 
     public function getTasksUpdateDates(array $tasks_ids) {

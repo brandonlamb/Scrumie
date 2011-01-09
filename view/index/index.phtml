@@ -5,23 +5,21 @@
 <div id="loginDialog" class="dialog">
     <form id="loginForm" onsubmit="return false;">
     <table>
-    <tr><td>Login:</td><td><input class="text" name="login" type="text"/></td></tr>
+    <tr><td>Project:</td><td><input class="text" name="name" type="text"/></td></tr>
     <tr><td>Password:</td><td><input class="text" name="password" type="password"/></td></tr>
-    <tr><td></td><td style="text-align: right"><input type="submit"/></td></tr>
+    <tr><td></td><td style="text-align: right"><input type="submit" value="Go!" /></td></tr>
     </table>
-    <a href="javascript: showRegistryDialog();">Registry</a>
-    ::
-    <a href="?controller=User&action=forgotPassword">Forgot </a>
+    <a href="javascript: showRegistryDialog();">+ New project</a>
     </form>
 </div>
 
 <div id="registryDialog" class="dialog">
     <form id="registryForm" onsubmit="return false;">
         <table>
-            <tr><td>Login:</td><td><input class="text" name="login" type="text"/></td></tr>
+            <tr><td>Name:</td><td><input class="text" name="name" type="text"/></td></tr>
             <tr><td>Password:</td><td><input class="text" name="password" type="password"/></td></tr>
             <tr><td>Repeat&nbsp;pwd:</td><td><input class="text" name="password2" type="password"/></td></tr>
-            <tr><td></td><td style="text-align: right"><input type="submit"/></td></tr>
+            <tr><td></td><td style="text-align: right"><input type="submit" value="Create" /></td></tr>
         </table>
     </form>
 </div>
@@ -31,7 +29,7 @@
 
         $('div#registryDialog input[type|="submit"]').click(function() {
             var formData = $('form#registryForm').serializeArray();
-            $.post('?controller=User&action=registry', formData, function(data, textStatus, Request) {
+            $.post('?controller=Project&action=registry', formData, function(data, textStatus, Request) {
                 if(data === true)
                     location.href = '?controller=Index';
                 else
@@ -41,7 +39,7 @@
 
         $('div#loginDialog input[type|="submit"]').click(function() {
             var formData = $('form#loginForm').serializeArray();
-            $.post('?controller=User&action=login', formData, function(data, textStatus, Request) {
+            $.post('?controller=Project&action=login', formData, function(data, textStatus, Request) {
                 if(data === true)
                     location.href = '?controller=Board';
                 else
@@ -62,7 +60,7 @@ function showLoginDialog() {
 
 function showRegistryDialog() {
     $( "#registryDialog" ).dialog({
-        title: 'Registry',
+        title: 'New project',
         closeOnEscape: false,
         draggable: false,
         resizable: false,

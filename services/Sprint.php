@@ -1,20 +1,22 @@
 <?php
 
 require_once ('./models/Sprint.php');
+
 class SprintService extends Service
 {
-    public function fetchAll() {
-        return Sprint::fetchAll();
+    public function fetchAllForProjectId($projectId) {
+        return Sprint::fetchBy('id_project', $projectId);
     }
 
     public function getById($id) {
         return Sprint::getById($id);
     }
 
-    public function addNewSprint($sprintName) {
+    public function addNewSprint($sprintName, $projectId) {
         $sprint = new Sprint();
         $sprint->name = $sprintName;
         $sprint->startdate = date('Y-m-d H:i:s', time());
+        $sprint->id_project = $projectId;
         $sprint->id_sprint = $sprint->insert();
 
         return $sprint;

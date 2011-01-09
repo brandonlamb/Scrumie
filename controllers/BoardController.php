@@ -1,5 +1,6 @@
 <?php
 
+class BoardControllerException extends ScrumieControllerException {}
 class BoardController extends ScrumieController {
 
     protected $layout = 'logged.phtml';
@@ -7,7 +8,10 @@ class BoardController extends ScrumieController {
     public function indexAction() {
         $sprintId = $this->_getParam('sprint');
 
-        $this->view->sprints = $this->getService('Sprint')->fetchAll();
+        if(!isset($_SESSION['projectId']))
+            throw new BoardControllerException('Unathorize access');
+
+        $this->view->sprints = $this->getService('Sprint')->fetchAllForProjectId($_SESSION['projectId']);
         $this->view->tasks = $this->getService('Task')->fetchTaskForSprint($sprintId);
         $this->view->detached = $this->getService('Task')->fetchDetached();
         $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : '-not selected-';
@@ -50,7 +54,8 @@ class BoardController extends ScrumieController {
 
     public function addNewSprintAction() {
         $sprintName = $this->_getParam('sprintName');
-        $sprint = $this->getService('Sprint')->addNewSprint($sprintName);
+        $projectId = $_SESSION['projectId'];
+        $sprint = $this->getService('Sprint')->addNewSprint($sprintName, $projectId);
         $this->result = $sprint->getId();
     }
 }

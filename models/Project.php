@@ -1,7 +1,7 @@
 <?php
 require_once('DataModel.php');
 
-class User extends DataModel 
+class Project extends DataModel 
 {
     protected $data = array(
         'id' => null,
@@ -19,7 +19,7 @@ class User extends DataModel
     }
 
     static public function authorize($name, $password) {
-        $result = self::fetch(sprintf("SELECT id FROM project WHERE name = '%s' and password = '%s' LIMIT 1", $name, md5($password)));
-        return ($result) ? true : false;
+        $result = self::fetch($sql = sprintf("SELECT id FROM project WHERE name = '%s' and password = '%s' LIMIT 1", $name, md5($password)));
+        return ($result) ? $result[0]->id : false;
     }
 }

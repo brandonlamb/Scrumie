@@ -58,8 +58,8 @@ abstract class DataModel implements ActiveRecordInterface
         return new $class($result[0]);
     }
 
-    static public function fetchBy($column, $value) {
-        return self::fetch(sprintf("SELECT * FROM %s WHERE %s = '%s'", static::TABLE, $column, $value));
+    static public function fetchBy($column, $value, array $order = array(), $limit = null) {
+        return self::fetch(sprintf("SELECT * FROM %s WHERE %s = '%s'", static::TABLE, $column, $value), $order, $limit);
     }
 
     static public function fetchByColumns(array $columns) {
@@ -94,8 +94,12 @@ abstract class DataModel implements ActiveRecordInterface
         return ($column) ? $result[0]->$column : new $class($result[0]);
     }
 
-    static public function fetch($sql) {
-        if($result = self::query($sql))
+    static public function fetch($sql, array $order = array(), $limit = null) {
+
+        $order = ($order) ? ' ORDER BY '.join(',', $order) : '';
+        $limit = ($limit) ? " LIMIT $limit" : '';
+
+        if($result = self::query($sql.$order.$limit))
             return $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
         return array();
     }

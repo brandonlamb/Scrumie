@@ -11,31 +11,42 @@
 <link href="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8/themes/redmond/jquery-ui.css" media="screen" rel="stylesheet" type="text/css" >
 
 <style type="text/css">
+    .over {border: 1px dashed red ;}
+    .tabContent {padding: 3px; background: #999;}
+    .round4 {border-radius: 4px; -moz-border-radius: 4px;}
+    .hidden {display: none;}
+
     body {font-size: 11px; padding: 0; background: darkgray;}
+
+    /* sprints */
+    div#sprintTitle {border-left: 1px solid black; background: #ddd; display: inline-block; margin: 5px; padding: 5px 5px; font-weight: bold;}
+    ul#sprints-list li { padding: 3px; font-size: 16px; }
+
+    /* board */
     table { width: 100%;}
     table th { border: 0px solid gray; width: 20%; height: 20px;}
     table th div.summary { float: right; }
     table td { border: 1px dashed #aaa; vertical-align: top; padding: 5px;}
 
-    div.task {float: left; margin: 5px; border: 1px solid #aaa; background: #fffecb; display: inline-block; font-size: 11px; font-family: Helvetica,Arial,sans-serif;}
+    /* task */
+    div.task {margin: 5px; border: 1px solid #aaa; font-size: 11px; font-family: Helvetica,Arial,sans-serif;}
     div.task span {background: #ddd; padding-left: 2px; padding-right: 2px;}
-
     div.editable {padding: 5px 5px;}
-    .over {border: 1px dashed red ;}
-    .tabContent {padding: 3px; background: #999;}
-    .round4 {border-radius: 4px; -moz-border-radius: 4px;}
+    div.estimation {background: #ddd; font-weight: bold; padding: 0; padding-left: 2px; padding-right: 2px}
+    /* task on board */
+    table#board div.task {float: left; display: inline-block; background: #fffecb;}
+    /* task in backlog */
+    div#detached div.task {background: #eee;}
 
+    /* context menu */
     div#conmenu {background: #ddd; border: 1px solid gray;}
     div#conmenu div {background: #fff; margin: 2px; padding: 5px;}
 
-    div.estimation {background: #ddd; font-weight: bold; padding: 0; padding-left: 2px; padding-right: 2px}
-    div#sprintTitle {border-left: 1px solid black; background: #ddd; display: inline-block; margin: 5px; padding: 5px 5px; font-weight: bold;}
+    /* backlog */
+    div.sortable div.list { border: 1px solid #aaa; cursor: move; background: #ddd; margin: 5px; padding: 10px; border-radius: 4px; -moz-border-radius: 4px;}
+    div.sortable div.list div.editable {margin-left: 20px; display: inline-block; width: 95%;}
+    div.sortable div.list span.estimate {text-align: center; font-weight: bold; background: #aaa; padding: 3px; display: inline-block; width: 30px;}
 
-    div.estimate-box {text-align: center; display: inline-box; width: 30px; font-weight: bold; float: right; background: #ddd;}
-
-    ul#sprints-list li { padding: 3px; font-size: 16px; }
-
-    .sortable li { cursor: move; background: #eee; margin: 5px; padding: 10px; border-radius: 4px; -moz-border-radius: 4px;}
 </style>
 
 </head>

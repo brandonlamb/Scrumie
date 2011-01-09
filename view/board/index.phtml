@@ -187,11 +187,14 @@ function prepareTask(stdClass $task) {
     </div>
 
     <div id="tabs-backlog" class="tabContent">
-        <button onclick="addNewTask();">+ Add new task</button>
-        <ol class="sortable" id="backlog-content">
-            <li><div title="Estimate" class="editable estimate-box">?</div><div class="editable">example 1</div></li>
-            <li><div title="Estimate" class="editable estimate-box">?</div><div class="editable">example 1</div></li>
-        </ol>
+        <button onclick="addNewBacklogTask();">+ Add new task</button>
+        <div class="sortable" id="detached">
+            <?php
+                foreach($this->detached as $task) {
+                    echo prepareTask($task);
+                }
+            ?>
+        </div>
     </div>
 </div>
 
@@ -219,7 +222,11 @@ function setDraggable() {
 }
 
 function setSortable() {
-    $(".sortable").sortable();
+    $(".sortable").sortable({
+        stop: function() {
+            mpr('reorder');
+        }
+    });
 }
 
 function setEditable() {
@@ -291,12 +298,11 @@ function setEditable() {
             $(this).unbind('focus');
 
             $(this).blur(function () {
-                mpr('save');
                 saveTask($(this).parent());
             });
 
             $(this).focus(function () {
-                mpr('edit');
+                //edit
             });
         });
     });
@@ -336,6 +342,21 @@ function addNewTask() {
     setDraggable();
 }
 
+function addNewBacklogTask() {
+    <?php
+        $task = new stdclass;
+        $task->estimation = 1;
+        $task->done = 0;
+        $task->body = 'Double click to edit...';
+        $task->id_task = null;
+        $task->owner = null;
+    ?>
+    var task = '<?= str_replace(array("\n", ' draggable'), '' ,prepareTask($task)); ?>';
+    $('#detached').append(task);
+    setSortable();
+    setEditable();
+}
+
 function addNewSprint() {
     var sprintName = prompt('Sprint name');
 
@@ -359,7 +380,6 @@ function addNewSprint() {
 
 $(".droppable").droppable({
     drop: function(event,ui) {
-        mpr('drop');
         ui.helper.appendTo(this);
         setDraggable();
         saveTask(ui.helper);

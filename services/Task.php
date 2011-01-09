@@ -20,19 +20,23 @@ class TaskService extends Service
             'inProgress' => $tasks['inProgress'],
             'commited' => $tasks['commited'],
             'readyForTest' => $tasks['readyForTest'],
-            'done' => $tasks['done'],
+            'done' => $tasks['done']
         );
+    }
+
+    public function fetchDetached() {
+        return Task::fetchDetached();
     }
 
     public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done) {
         $task = new Task();
-        $task->id_sprint = $sprintId;
         $task->id_task = $taskId;
         $task->body = $body;
         $task->estimation = $estimation;
         $task->owner = $owner;
         $task->state = $state;
         $task->done = $done;
+        $task->id_sprint = ($state == Task::STATE_DETACHED) ? null : $sprintId;
 
         if($taskId) 
             $task->update();

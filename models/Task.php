@@ -9,13 +9,15 @@ class Task extends DataModel
     const STATE_COMMITED = 'commited';
     const STATE_READYFORTEST = 'readyForTest';
     const STATE_DONE = 'done';
+    const STATE_DETACHED = 'detached';
 
     static public $availablesStates = array(
         self::STATE_TODO,
         self::STATE_INPROGRESS,
         self::STATE_COMMITED,
         self::STATE_READYFORTEST,
-        self::STATE_DONE
+        self::STATE_DONE,
+        self::STATE_DETACHED
     );
 
     protected $data = array(
@@ -36,9 +38,13 @@ class Task extends DataModel
         return self::fetchBy('id_sprint', $sprintId);
     }
 
+    static public function fetchDetached() {
+        return self::fetchBy('state', self::STATE_DETACHED);
+    }
+
     public function __set_state($value) {
         if(!in_array($value, self::$availablesStates))
-            throw new InvalidArgumentException('Invalid state for task');
+            throw new InvalidArgumentException("Invalid state for task $value");
 
         $this->data['state'] = $value;
     }

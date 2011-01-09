@@ -21,6 +21,11 @@ class BoardController extends ScrumieController {
         $this->view->btc_x_categories = '"'.join('","', $updates).'"';
     }
 
+    public function reorderTaskAction() {
+        $order = $this->_getParam('order');
+
+        $this->getService('Task')->reorderTask($order);
+    }
     public function saveTaskAction() {
         $sprintId = $this->_getParam('sprintId');
         $taskId = $this->_getParam('taskId');

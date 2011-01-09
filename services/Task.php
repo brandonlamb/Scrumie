@@ -28,6 +28,11 @@ class TaskService extends Service
         return Task::fetchDetached();
     }
 
+    public function reorderTask(array $order) {
+        foreach($order as $index => $task_id)
+            DataModel::query("UPDATE task SET \"order\" = $index WHERE id_task = $task_id");
+    }
+
     public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done) {
         $task = new Task();
         $task->id_task = $taskId;

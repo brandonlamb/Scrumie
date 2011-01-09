@@ -1,5 +1,5 @@
 <?php
-function prepareTask(stdClass $task) {
+function prepareTask(stdClass $task, $draggable = true) {
 
     if($task->estimation === null)
         $task->estimation = 1;
@@ -7,8 +7,10 @@ function prepareTask(stdClass $task) {
     if($task->done === null)
         $task->done = 0;
 
+    $draggable = ($draggable) ? 'draggable' : '';
+
     $taskHelper = '
-        <div id="%s" class="task round4 draggable">
+        <div id="%s" class="task round4 %s">
             <div class="editable body">%s</div>
             <span title="Estimation" class="estimation">%s</span>
             &nbsp;
@@ -17,7 +19,7 @@ function prepareTask(stdClass $task) {
             <span class="owner" title="Owner" style="float: right;">%s</span>
         </div>';
 
-    return sprintf($taskHelper, $task->id_task, $task->body, $task->estimation, $task->done, $task->owner);
+    return sprintf($taskHelper, $task->id_task, $draggable, $task->body, $task->estimation, $task->done, $task->owner);
 }
 ?>
 
@@ -191,7 +193,7 @@ function prepareTask(stdClass $task) {
         <div class="sortable" id="detached">
             <?php
                 foreach($this->detached as $task) {
-                    echo prepareTask($task);
+                    echo prepareTask($task, false);
                 }
             ?>
         </div>
@@ -224,7 +226,13 @@ function setDraggable() {
 function setSortable() {
     $(".sortable").sortable({
         stop: function() {
-            mpr('reorder');
+            var order = new Array;
+            $.each($(this).children('div.task'), function(index, element) {
+                order[index] = $(element).attr('id');
+            });
+
+            $.post('?controller=Board&action=reorderTask', {'order': order}, function(data, status, Request) {
+            });
         }
     });
 }
@@ -351,7 +359,7 @@ function addNewBacklogTask() {
         $task->id_task = null;
         $task->owner = null;
     ?>
-    var task = '<?= str_replace(array("\n", ' draggable'), '' ,prepareTask($task)); ?>';
+    var task = '<?= str_replace("\n", '' ,prepareTask($task, false)); ?>';
     $('#detached').append(task);
     setSortable();
     setEditable();

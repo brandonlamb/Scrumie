@@ -39,7 +39,7 @@ class Task extends DataModel
     }
 
     static public function fetchDetached() {
-        return self::fetchBy('state', self::STATE_DETACHED);
+        return self::fetchBy('state', self::STATE_DETACHED, array('"order" ASC'));
     }
 
     public function __set_state($value) {

@@ -23,7 +23,7 @@ abstract class DataModel implements ActiveRecordInterface
         $columns = array();
         $values = array();
         foreach($data as $column => $value) {
-            $columns[] = $column;
+            $columns[] = '"'.$column.'"';
             $values[] = "'$value'";
         }
         $sql = sprintf("INSERT INTO %s (%s) VALUES (%s)", static::TABLE, join(',',$columns), join(',', $values));

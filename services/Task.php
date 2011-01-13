@@ -12,8 +12,12 @@ class TaskService extends Service
         $tasks['readyForTest'] = array(); 
         $tasks['done'] = array(); 
 
-        foreach(Task::fetchBySprintId($sprintId) as $task)
+        if(! $sprintId)
+            return $tasks;
+
+        foreach(Task::fetchBySprintId($sprintId) as $task) {
             $tasks[$task->state][] = $task;
+        }
 
         return array(
             'todo' => $tasks['todo'],
@@ -24,8 +28,8 @@ class TaskService extends Service
         );
     }
 
-    public function fetchDetached() {
-        return Task::fetchDetached();
+    public function fetchDetached($projectId) {
+        return Task::fetchDetached($projectId);
     }
 
     public function reorderTask(array $order) {
@@ -33,7 +37,7 @@ class TaskService extends Service
             DataModel::query("UPDATE task SET \"order\" = $index WHERE id_task = $task_id");
     }
 
-    public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done) {
+    public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId) {
         $task = new Task();
         $task->id_task = $taskId;
         $task->body = $body;
@@ -41,6 +45,7 @@ class TaskService extends Service
         $task->owner = $owner;
         $task->state = $state;
         $task->done = $done;
+        $task->id_project = $projectId;
         $task->id_sprint = ($state == Task::STATE_DETACHED) ? null : $sprintId;
 
         if($taskId) 

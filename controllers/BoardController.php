@@ -5,16 +5,20 @@ class BoardController extends ScrumieController {
 
     protected $layout = 'logged.phtml';
 
+    public function getCurrentProjectId() {
+        return (int) $_SESSION['projectId'];
+    }
+
     public function indexAction() {
         $sprintId = $this->_getParam('sprint');
 
-        if(!isset($_SESSION['projectId']))
+        if(!$this->getCurrentProjectId())
             throw new BoardControllerException('Unathorize access');
 
-        $this->view->sprints = $this->getService('Sprint')->fetchAllForProjectId($_SESSION['projectId']);
+        $this->view->sprints = $this->getService('Sprint')->fetchAllForProjectId($this->getCurrentProjectId());
         $this->view->tasks = $this->getService('Task')->fetchTaskForSprint($sprintId);
-        $this->view->detached = $this->getService('Task')->fetchDetached();
-        $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : '-not selected-';
+        $this->view->detached = $this->getService('Task')->fetchDetached($this->getCurrentProjectId());
+        $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : 'not set';
         $this->view->btc_y_max = $this->getService('Sprint')->getSprintEstimation($sprintId) + 1;
         $this->view->btc_series = join(',',$this->getService('Sprint')->getEstimationForEachSprintDate($sprintId));
 
@@ -30,6 +34,7 @@ class BoardController extends ScrumieController {
 
         $this->getService('Task')->reorderTask($order);
     }
+
     public function saveTaskAction() {
         $sprintId = $this->_getParam('sprintId');
         $taskId = $this->_getParam('taskId');
@@ -38,8 +43,9 @@ class BoardController extends ScrumieController {
         $owner = $this->_getParam('owner');
         $state = $this->_getParam('state');
         $done = $this->_getParam('done');
+        $projectId = $this->getCurrentProjectId();
 
-        $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done);
+        $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId);
 
         $this->result = $task->getId();
     }
@@ -54,7 +60,7 @@ class BoardController extends ScrumieController {
 
     public function addNewSprintAction() {
         $sprintName = $this->_getParam('sprintName');
-        $projectId = $_SESSION['projectId'];
+        $projectId = $this->getCurrentProjectId();
         $sprint = $this->getService('Sprint')->addNewSprint($sprintName, $projectId);
         $this->result = $sprint->getId();
     }

@@ -1,5 +1,5 @@
 <?php
-function prepareTask(stdClass $task, $draggable = true) {
+function prepareTask(Task $task, $draggable = true) {
 
     if($task->estimation === null)
         $task->estimation = 1;
@@ -353,7 +353,7 @@ function addNewTask() {
 
 function addNewBacklogTask() {
     <?php
-        $task = new stdclass;
+        $task = new Task;
         $task->estimation = 1;
         $task->done = 0;
         $task->body = 'Double click to edit...';

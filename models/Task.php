@@ -28,6 +28,8 @@ class Task extends DataModel
         'owner' => null,
         'state' => null,
         'done' => null,
+        'order' => null,
+        'id_project' => null,
     );
 
     const _CLASS_ = __CLASS__;
@@ -38,8 +40,8 @@ class Task extends DataModel
         return self::fetchBy('id_sprint', $sprintId);
     }
 
-    static public function fetchDetached() {
-        return self::fetchBy('state', self::STATE_DETACHED, array('"order" ASC'));
+    static public function fetchDetached($projectId) {
+        return self::fetchByColumns(array('state' => self::STATE_DETACHED, 'id_project' => $projectId), array('"order" ASC'));
     }
 
     public function __set_state($value) {

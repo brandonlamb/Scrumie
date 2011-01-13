@@ -30,8 +30,7 @@ class Application {
         return $this->FrontController->getActionName();
     }
 
-    public function dispatch($controller, $action)
-    {
+    public function dispatch($controller, $action) {
         return $this->FrontController->dispatch($controller, $action);
     }
 

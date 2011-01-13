@@ -38,7 +38,7 @@ abstract class DataModel implements ActiveRecordInterface
         $values = array();
 
         foreach($data as $column => $value)
-            $values[] = $column ."='$value'";
+            $values[] = '"'.$column.'"' . " = '$value'";
 
         $sql = sprintf("UPDATE %s SET %s WHERE %s = %s", static::TABLE, join(',',$values), static::INDEX, $this->getId());
         $result = self::query($sql);
@@ -70,14 +70,7 @@ abstract class DataModel implements ActiveRecordInterface
             $where[] = "$key = '$values'";
 
         $sql = sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where));
-        $result = self::fetch(sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where)), $order, $limit);
-
-        $collection = array();
-        $class = static::_CLASS_;
-        foreach($result as $data)
-            $collection[] = new $class($data);
-
-        return $collection;
+        return self::fetch(sprintf("SELECT * FROM %s WHERE %s", static::TABLE, join(' AND ', $where)), $order, $limit);
     }
 
     static public function fetchAll() {
@@ -95,13 +88,19 @@ abstract class DataModel implements ActiveRecordInterface
     }
 
     static public function fetch($sql, array $order = array(), $limit = null) {
-
         $order = ($order) ? ' ORDER BY '.join(',', $order) : '';
         $limit = ($limit) ? " LIMIT $limit" : '';
+        $collection = array();
 
-        if($result = self::query($sql.$order.$limit))
-            return $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
-        return array();
+        if($result = self::query($sql.$order.$limit)) {
+            $data = $result->fetchAll(PDO::FETCH_CLASS, 'stdClass');
+
+            $class = static::_CLASS_;
+            foreach($data as $object)
+                $collection[] = (static::_CLASS_ == __CLASS__) ? $object : new $class($object);
+        }
+
+        return $collection;
     }
 
     static public function query($sql) {

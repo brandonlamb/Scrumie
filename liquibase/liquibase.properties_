@@ -1,0 +1,7 @@
+#liquibase.properties
+driver: org.postgresql.Driver
+classpath: lib/postgresql.jdbc.jar
+url: jdbc:postgresql://localhost:5432/scrumie
+username: scrumie
+password: scrumie
+changeLogFile: changelog.xml

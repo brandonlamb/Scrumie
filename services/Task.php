@@ -34,12 +34,12 @@ class TaskService extends Service
 
     public function reorderTask(array $order) {
         foreach($order as $index => $task_id)
-            DataModel::query("UPDATE task SET \"order\" = $index WHERE id_task = $task_id");
+            DataModel::query("UPDATE task SET \"order\" = $index WHERE id = $task_id");
     }
 
     public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId) {
         $task = new Task();
-        $task->id_task = $taskId;
+        $task->id = $taskId;
         $task->body = $body;
         $task->estimation = $estimation;
         $task->owner = $owner;
@@ -51,7 +51,7 @@ class TaskService extends Service
         if($taskId) 
             $task->update();
         else
-            $task->id_task = $task->insert();
+            $task->id = $task->insert();
 
         $this->saveToHistory($task);
         
@@ -60,7 +60,7 @@ class TaskService extends Service
 
     public function saveToHistory(Task $task) {
         $today = date('Y-m-d 00:00:00', time());
-        $taskHistory = TaskHistory::getIfExistsOrCreateNewOne($task->id_task, $today);
+        $taskHistory = TaskHistory::getIfExistsOrCreateNewOne($task->id, $today);
         $taskHistory->done = $task->done;
 
         if($taskHistory->id)

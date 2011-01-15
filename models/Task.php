@@ -21,7 +21,7 @@ class Task extends DataModel
     );
 
     protected $data = array(
-        'id_task' => null,
+        'id' => null,
         'body' => null,
         'estimation' => null,
         'id_sprint' => null,
@@ -34,7 +34,7 @@ class Task extends DataModel
 
     const _CLASS_ = __CLASS__;
     const TABLE = 'task';
-    const INDEX = 'id_task';
+    const INDEX = 'id';
 
     static public function fetchBySprintId($sprintId) {
         return self::fetchBy('id_sprint', $sprintId);
@@ -52,6 +52,6 @@ class Task extends DataModel
     }
 
     public function getHistory() {
-        return TaskHistory::fetchBy('task_id', $this->id_task);
+        return TaskHistory::fetchBy('task_id', $this->id);
     }
 }

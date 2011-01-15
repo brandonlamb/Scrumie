@@ -17,15 +17,15 @@ class SprintService extends Service
         $sprint->name = $sprintName;
         $sprint->startdate = date('Y-m-d H:i:s', time());
         $sprint->id_project = $projectId;
-        $sprint->id_sprint = $sprint->insert();
+        $sprint->id = $sprint->insert();
 
         return $sprint;
     }
 
     public function getAllTaskIdsForSprint($sprintId) {
         $tasks_ids = array();
-        foreach(DataModel::fetch("select id_task from task where id_sprint = $sprintId") as $data)
-            $tasks_ids[] = $data->id_task;
+        foreach(DataModel::fetch("select id from task where id_sprint = $sprintId") as $data)
+            $tasks_ids[] = $data->id;
         return $tasks_ids;
     }
 

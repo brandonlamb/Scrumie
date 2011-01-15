@@ -6,6 +6,7 @@ require_once ('./models/TaskHistory.php');
 class TaskService extends Service
 {
     public function fetchTaskForSprint($sprintId) {
+        //xxx move this to controller
         $tasks['todo'] = array(); 
         $tasks['inProgress'] = array(); 
         $tasks['commited'] = array(); 
@@ -15,9 +16,8 @@ class TaskService extends Service
         if(! $sprintId)
             return $tasks;
 
-        foreach(Task::fetchBySprintId($sprintId) as $task) {
+        foreach(DAO::get('Task')->by('id_sprint', $sprintId) as $task)
             $tasks[$task->state][] = $task;
-        }
 
         return array(
             'todo' => $tasks['todo'],
@@ -29,12 +29,13 @@ class TaskService extends Service
     }
 
     public function fetchDetached($projectId) {
-        return Task::fetchDetached($projectId);
+        return DAO::get('Task')->fetchBy(array('state' => Task::STATE_DETACHED, 'id_project' => $projectId), array('"order" ASC'));
     }
+
 
     public function reorderTask(array $order) {
         foreach($order as $index => $task_id)
-            DataModel::query("UPDATE task SET \"order\" = $index WHERE id = $task_id");
+            DAO::query("UPDATE task SET \"order\" = $index WHERE id = $task_id");
     }
 
     public function saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId) {
@@ -49,9 +50,9 @@ class TaskService extends Service
         $task->id_sprint = ($state == Task::STATE_DETACHED) ? null : $sprintId;
 
         if($taskId) 
-            $task->update();
+            DAO::update($task);
         else
-            $task->id = $task->insert();
+            $task->id = DAO::insert($task);
 
         $this->saveToHistory($task);
         
@@ -64,23 +65,23 @@ class TaskService extends Service
         $taskHistory->done = $task->done;
 
         if($taskHistory->id)
-            $taskHistory->update();
+            DAO::update($taskHistory);
         else
-            $taskHistory->insert();
+            DAO::insert($taskHistory);
     }
 
     public function deleteTask($taskId) {
-        Task::getById($taskId)->delete();
+        DAO::delete('Task', $taskId);
         $this->deleteTaskHistory($taskId);
     }
 
     public function deleteTaskHistory($taskId) {
-        DataModel::query("DELETE FROM task_history WHERE id_task = $taskId");
+        DAO::query("DELETE FROM task_history WHERE id_task = $taskId");
     }
 
     public function getTasksUpdateDates(array $tasks_ids) {
         $dates = array();
-        foreach(DataModel::fetch(sprintf("select distinct date from task_history where id_task in (%s) order by date asc",join(',',$tasks_ids))) as $data)
+        foreach(DAO::get('TaskHistory')->by('id_task', $tasks_ids, array('date ASC')) as $data)
             $dates[] = $data->date;
         return $dates;
     }

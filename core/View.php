@@ -8,10 +8,14 @@ class View {
     }
 
     public function __toString() {
-        return $this->render();
+        try {
+            return $this->render();
+        } catch (Exception $e) {
+            return $e->getTraceAsString();
+        }
     }
     
-    protected function render() {
+    public function render() {
         ob_start();
         include($this->getTemplateFilePath());
         $body = ob_get_contents();
@@ -19,7 +23,7 @@ class View {
         return $body;
     }
 
-    protected function getTemplateFilePath() {
+    public function getTemplateFilePath() {
         return $this->_template_dir.'/'.$this->_template_file;
     }
 

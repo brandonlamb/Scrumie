@@ -1,44 +1,23 @@
 <?php
 
-class Database
-{
-    private $db;
+require_once ('DbResult.php');
 
-    public function __construct() {
-        $this->db = new PDO('sqlite:'.DATABASE);
+class DatabaseAdapter
+{
+    public $db;
+
+    public function __construct(PDO $pdo_adapter) {
+        $this->db = $pdo_adapter;
+        $this->db->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    }
+
+    public function __call($name, $arguments) {
+        return call_user_func_array(array($this->db, $name), $arguments);
     }
 
     public function query($sql) {
-        return $this->db->query($sql);
-    }
-
-    public function lastInsertId() {
-        return $this->db->lastInsertId();
-    }
-
-    static public function checkDatabaseConnection() {
-        if(! class_exists('PDO'))
-            throw new RuntimeException('Missing PDO class');
-
-        if(! is_writable('data'))
-            throw new RuntimeException(sprintf('Directory ./data is not writable'));
-
-        if(! is_file(DATABASE)) { 
-            //when database dosen't exist this will crate new from migration file
-            $newDb = new PDO('sqlite:'.DATABASE); 
-            $sql = file_get_contents('data/scrumie.sql');
-            foreach(explode("\n", $sql) as $query) {
-                if(!$query)
-                    continue;
-
-                $result = $newDb->query($query);
-            }
-        }
-
-        if(! is_readable(DATABASE))
-            throw new RuntimeException(sprintf('Database %s file is not readable', DATABASE));
-
-        if(! is_writable(DATABASE))
-            throw new RuntimeException(sprintf('Database %s file is not writeable', DATABASE));
+        $statement = $this->db->query($sql);
+        return new DbResult($statement);
     }
 }
+

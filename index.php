@@ -4,15 +4,13 @@
  * @licence GNU General Public Licence
  * http://scrumie.cjb.net
  */
-if(! is_readable('./data'))
-    die('./data directory is not readable');
-if(! is_writable('./data'))
-    die('./data directory is not writable');
+require_once ('./core/Application.php');
+require_once('./controllers/ScrumieController.php');
 
-require_once ('core/Application.php');
-require_once('./lib/ScrumieController.php');
-require_once('./lib/Database.php');
-define('DATABASE', 'data/scrumie.sqlite');
+
+require_once('./core/DAO.php');
+DAO::setAdapter(new DatabaseAdapter(new PDO('sqlite:data/scrumie.sqlite')));
+
 session_start();
 $App = Application::getInstance();
 

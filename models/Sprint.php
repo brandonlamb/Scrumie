@@ -1,7 +1,6 @@
 <?php
-require_once('DataModel.php');
 
-class Sprint extends DataModel 
+class Sprint extends DbModel
 {
     protected $data = array(
         'id' => null,
@@ -10,7 +9,6 @@ class Sprint extends DataModel
         'id_project' => null,
     );
 
-    const _CLASS_ = __CLASS__;
     const TABLE = 'sprint';
     const INDEX = 'id';
 }

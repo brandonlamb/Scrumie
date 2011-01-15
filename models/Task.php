@@ -1,9 +1,10 @@
 <?php
 
-require_once('DataModel.php');
-
-class Task extends DataModel 
+class Task extends DbModel
 {
+    const TABLE = 'task';
+    const INDEX = 'id';
+
     const STATE_TODO = 'todo';
     const STATE_INPROGRESS = 'inProgress';
     const STATE_COMMITED = 'commited';
@@ -31,18 +32,6 @@ class Task extends DataModel
         'order' => null,
         'id_project' => null,
     );
-
-    const _CLASS_ = __CLASS__;
-    const TABLE = 'task';
-    const INDEX = 'id';
-
-    static public function fetchBySprintId($sprintId) {
-        return self::fetchBy('id_sprint', $sprintId);
-    }
-
-    static public function fetchDetached($projectId) {
-        return self::fetchByColumns(array('state' => self::STATE_DETACHED, 'id_project' => $projectId), array('"order" ASC'));
-    }
 
     public function __set_state($value) {
         if(!in_array($value, self::$availablesStates))

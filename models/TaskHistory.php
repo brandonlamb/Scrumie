@@ -1,8 +1,5 @@
 <?php
-
-require_once('DataModel.php');
-
-class TaskHistory extends DataModel 
+class TaskHistory extends DbModel
 {
     protected $data = array(
         'id' => null,
@@ -11,12 +8,11 @@ class TaskHistory extends DataModel
         'done' => null,
     );
 
-    const _CLASS_ = __CLASS__;
     const TABLE = 'task_history';
     const INDEX = 'id';
 
     static public function getIfExistsOrCreateNewOne($taskId, $date) {
-        $result = self::fetchByColumns(array('id_task' => $taskId, 'date' => $date));
+        $result = DAO::get(__CLASS__)->by(array('id_task' => $taskId, 'date' => $date));
 
         if($result)
             $taskHistory = $result[0];

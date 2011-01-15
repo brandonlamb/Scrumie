@@ -19,7 +19,7 @@ function prepareTask(Task $task, $draggable = true) {
             <span class="owner" title="Owner" style="float: right;">%s</span>
         </div>';
 
-    return sprintf($taskHelper, $task->id_task, $draggable, $task->body, $task->estimation, $task->done, $task->owner);
+    return sprintf($taskHelper, $task->id, $draggable, $task->body, $task->estimation, $task->done, $task->owner);
 }
 ?>
 
@@ -129,7 +129,7 @@ function prepareTask(Task $task, $draggable = true) {
     <ul id="sprints-list">
         <?php
         foreach($this->sprints as $sprint) {
-            echo sprintf('<li><a href="?controller=Board&sprint=%s">%s</a></li>', $sprint->id_sprint, $sprint->name);
+            echo sprintf('<li><a href="?controller=Board&sprint=%s">%s</a></li>', $sprint->id, $sprint->name);
         }
         ?>
     </ul>
@@ -357,7 +357,7 @@ function addNewBacklogTask() {
         $task->estimation = 1;
         $task->done = 0;
         $task->body = 'Double click to edit...';
-        $task->id_task = null;
+        $task->id = null;
         $task->owner = null;
     ?>
     var task = '<?= str_replace("\n", '' ,prepareTask($task, false)); ?>';

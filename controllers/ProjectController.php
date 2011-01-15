@@ -3,11 +3,13 @@
 class ProjectController extends ScrumieController 
 {
     public function registryAction() {
-       $serviceUser = $this->getService('Project');
+       $service = $this->getService('Project');
        try {
-           $serviceUser->registry($this->_getParam('name'), $this->_getParam('password'));
+           $service->registry($this->_getParam('name'), $this->_getParam('password'));
            $this->result = true;
        } catch (Exception $e) {
+           //xxx all errors should be passed to error controller
+           mpr($e,1);
            $this->result = $e->getMessage();
        }
     }
@@ -26,8 +28,6 @@ class ProjectController extends ScrumieController
 
     public function logoutAction() {
         session_destroy();
-
         $this->_redirect('Index', 'index');
-
     }
 }

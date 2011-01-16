@@ -12,7 +12,7 @@ require_once('./controllers/ScrumieController.php');
 session_start();
 
 //$dsn = 'sqlite:data/scrumie.sqlite';
-$dsn = 'pgsql:dbname=scrumie;host=localhost;user=postgres;password=nigro12;port=5433';
+$dsn = 'pgsql:dbname=scrumie;host=127.0.0.1;user=postgres;port=5433';
 
 DAO::setAdapter(new DatabaseAdapter(new PDO($dsn)));
 $App = Application::getInstance();

@@ -30,8 +30,15 @@ class FrontController {
         if(!$ControllerCalled instanceof Controller)
             throw new Exception(sprintf('Controller %s must be instanceof Controller', $controller_name));
 
-        $ControllerCalled->$action_name();
+        try {
+            $ControllerCalled->$action_name();
+            $ControllerCalled->flush();
+        } catch (Exception $e) {
+            require_once($this->controlers_dir.'ErrorController.php');
+            $ErrorController = new ErrorController();
+            $ErrorController->index($e);
+            $ErrorController->flush();
+        }
 
-        $ControllerCalled->flush($action);
     }
 }

@@ -1,0 +1,6 @@
+<h1>Ups! we have trouble:</h1>
+<h2><?= get_class($this->error); ?></h2>
+<p><b><?= $this->error->getMessage(); ?></b></p>
+<pre>
+<?= $this->error->getTraceAsString(); ?>
+</pre>

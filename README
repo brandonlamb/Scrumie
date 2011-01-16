@@ -10,9 +10,5 @@ Instalation:
      * http server (eg Apache)
 
     database:
-     * scrumie use sqlite database that should be placed inside data folder as scrumie.sqlite file
-       you can use template database:
-
-           cp data/scrumie.sqlite.dist data/scrumie.sqlite
-
-       and login to scrumie as domo:demo 
+     - Use liquibase to create database structure
+       cd ./liquibase && java -jar liquibase.jar update

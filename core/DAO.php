@@ -12,12 +12,14 @@ class DAO {
     public $modelName;
     public $tableName;
     public $indexName;
+    public $sequenceName;
     static public $dbAdapter;
 
     public function __construct($className) {
         $this->modelName = $className;
         $this->tableName = constant($className.'::TABLE');
         $this->indexName = constant($className.'::INDEX');
+        $this->sequenceName = $this->tableName . '_' . $this->indexName . '_seq';
     }
 
     static public function setAdapter(DatabaseAdapter $adapter) {
@@ -107,13 +109,13 @@ class DAO {
         $values = array();
         foreach($data as $column => $value) {
             $columns[] = '"'.$column.'"';
-            $values[] = "'$value'";
+            $values[] = self::prepareValueForSql($value);
         }
 
         $sql = sprintf("INSERT INTO %s (%s) VALUES (%s)", $adapter->tableName, join(',',$columns), join(',', $values));
 
         $result = self::query($sql);
-        return self::$dbAdapter->lastInsertId();
+        return self::$dbAdapter->lastInsertId($adapter->sequenceName);
     }
 
     static public function update(DbModel $model) {
@@ -123,7 +125,7 @@ class DAO {
 
         $values = array();
         foreach($data as $column => $value)
-            $values[] = '"'.$column.'"' . " = '$value'";
+            $values[] = '"'.$column.'" = '.self::prepareValueForSql($value);
 
         $sql = sprintf("UPDATE %s SET %s WHERE %s = %s", $adapter->tableName, join(',',$values), $adapter->indexName, $model->getId());
         $result = self::query($sql);
@@ -143,5 +145,18 @@ class DAO {
         $adapter = new self($modelName);
         $sql = sprintf("DELETE FROM %s WHERE %s = '%s'", $adapter->tableName, $adapter->indexName, $id);
         self::query($sql);
+    }
+
+    static public function prepareValueForSql($value) {
+        if(is_string($value))
+            $result = $value ? "'$value'" : 'NULL';
+        elseif(is_numeric($value))
+            $result = $value === null ? 'NULL' : $value;
+        elseif($value === null)
+            $result = 'NULL';
+        else 
+            $result = $value;
+
+        return $result;
     }
 }

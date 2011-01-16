@@ -1,7 +1,7 @@
 <?php
 
 class ErrorController extends Controller {
-    protected $layout = 'default.phtml';
+    public $layout = 'default.phtml';
 
     public function index(Exception $e) {
         $this->view->error = $e;

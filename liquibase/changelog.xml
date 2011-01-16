@@ -48,6 +48,9 @@
             <column name="owner" type="varchar(64)"/>
             <column name="state" type="varchar(64)"/>
             <column name='"order"' type="int"/>
+            <column name="done" type="int">
+                <constraints nullable="false"/>
+            </column>
             <column name="id_sprint" type="int" />
             <column name="id_project" type="int">
                 <constraints nullable="false"/>

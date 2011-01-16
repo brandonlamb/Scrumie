@@ -4,14 +4,8 @@ class ProjectController extends ScrumieController
 {
     public function registryAction() {
        $service = $this->getService('Project');
-       try {
-           $service->registry($this->_getParam('name'), $this->_getParam('password'));
-           $this->result = true;
-       } catch (Exception $e) {
-           //xxx all errors should be passed to error controller
-           mpr($e,1);
-           $this->result = $e->getMessage();
-       }
+       $service->registry($this->_getParam('name'), $this->_getParam('password'));
+       $this->result = true;
     }
 
     public function loginAction() {

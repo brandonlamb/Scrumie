@@ -94,3 +94,9 @@ function getAsNumber(value) {
 
     return parseFloat(value);
 }
+
+function isset(variable) {
+    if(typeof(variable) === 'undefined')
+        return false;
+    return true;
+}

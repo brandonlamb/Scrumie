@@ -2,6 +2,7 @@
     .dialog {display: none;}
     input.text {width: 180px;}
 </style>
+<center>
 <div id="loginDialog" class="dialog">
     <form id="loginForm" onsubmit="return false;">
     <table>
@@ -11,11 +12,13 @@
     </table>
     <a href="javascript: showRegistryDialog();">+ New project</a> 
     <br/><small>You can also login to demo project as demo:demo</small>
+
     </form>
 
     <div style="margin-top: 10px; padding: 5px; background: #ddd; text-align: center">
         <h1>Scrumie</h1>
         <p>Copyright &copy; 2010 <a href="http://nowicki.cjb.net">Roman Nowicki</a></p>
+        <small><a href="https://download.github.com/nigro-Scrumie-a87ebe7.tar.gz">Download source</a></small>
         <p>
         <form action="https://www.paypal.com/cgi-bin/webscr" method="post">
         <input type="hidden" name="cmd" value="_s-xclick">
@@ -38,33 +41,34 @@
         </table>
     </form>
 </div>
+</center>
 
 
 <script>
-    $(function() {
-        showLoginDialog();
+$(document).ready(function() {
+    showLoginDialog();
 
-        $('div#registryDialog input[type|="submit"]').click(function() {
-            var formData = $('form#registryForm').serializeArray();
-            $.post('?controller=Project&action=registry', formData, function(data, textStatus, Request) {
-                if(isset(data.error)) {
-                    alert(data.error)
-                }
-                else
-                    location.href = '?controller=Index';
-            });
-        });
-
-        $('div#loginDialog input[type|="submit"]').click(function() {
-            var formData = $('form#loginForm').serializeArray();
-            $.post('?controller=Project&action=login', formData, function(data, textStatus, Request) {
-                if(data === true)
-                    location.href = '?controller=Board';
-                else
-                    alert('Authorization failed');
-            });
+    $('div#registryDialog input[type|="submit"]').click(function() {
+        var formData = $('form#registryForm').serializeArray();
+        $.post('?controller=Project&action=registry', formData, function(data, textStatus, Request) {
+            if(isset(data.error)) {
+                alert(data.error)
+            }
+            else
+                location.href = '?controller=Index';
         });
     });
+
+    $('div#loginDialog input[type|="submit"]').click(function() {
+        var formData = $('form#loginForm').serializeArray();
+        $.post('?controller=Project&action=login', formData, function(data, textStatus, Request) {
+            if(data === true)
+                location.href = '?controller=Board';
+            else
+                alert('Authorization failed');
+        });
+    });
+});
 
 function showLoginDialog() {
 

@@ -3,7 +3,7 @@
 class BoardControllerException extends ScrumieControllerException {}
 class BoardController extends ScrumieController {
 
-    protected $layout = 'logged.phtml';
+    public $layout = 'logged.phtml';
 
     public function indexAction() {
         $sprintId = $this->_getParam('sprint');

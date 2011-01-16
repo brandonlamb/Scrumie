@@ -1,11 +1,12 @@
 <?php
 
 abstract class Controller {
-    protected $templateFile = 'index.phtml';
-    protected $templateDir;
-    protected $view;
-    protected $layout;
-    protected $result;
+    public $templateFile = 'index.phtml';
+    public $templateDir;
+    public $view;
+    public $layout;
+    public $result;
+    public $calledMethod;
 
     final public function __construct() {
         $this->view = new View;
@@ -13,7 +14,9 @@ abstract class Controller {
         $this->init();
     }
 
-    protected function init() { }
+    public function init() { }
+    public function preDispatch() { }
+    public function postDispatch() { }
 
     public function flush() {
         if(Application::getInstance()->isAjaxRequest()) {
@@ -41,16 +44,16 @@ abstract class Controller {
 
     }
 
-    protected function _forward($controller, $action) {
+    public function _forward($controller, $action) {
         Application::getInstance()->dispatch($controller, $action);
     }
 
-    protected function _redirect($controller, $action) {
+    public function _redirect($controller, $action) {
         header(sprintf('Location: ?controller=%s&action=%s', $controller, $action));
         exit;
     }
 
-    protected function _getParam($name, $default = null) {
+    public function _getParam($name, $default = null) {
         return Application::getInstance()->getRequest()->getParam($name, $default);
     }
 }

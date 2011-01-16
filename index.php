@@ -11,6 +11,9 @@ require_once('./controllers/ScrumieController.php');
 
 session_start();
 
-DAO::setAdapter(new DatabaseAdapter(new PDO('sqlite:data/scrumie.sqlite')));
+//$dsn = 'sqlite:data/scrumie.sqlite';
+$dsn = 'pgsql:dbname=scrumie;host=localhost;user=postgres;password=nigro12;port=5433';
+
+DAO::setAdapter(new DatabaseAdapter(new PDO($dsn)));
 $App = Application::getInstance();
 $App->dispatch($App->getControllerName(), $App->getActionName());

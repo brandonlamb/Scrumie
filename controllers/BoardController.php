@@ -50,20 +50,14 @@ class BoardController extends ScrumieController {
         $this->result = $sprint->getId();
     }
 
-
-    /** not ready **/
-    public function reorderTaskAction() {
-        $order = $this->_getParam('order');
-
-        $this->getService('Task')->reorderTask($order);
-    }
-
     public function deleteTaskAction() {
         $taskId = $this->_getParam('taskId');
-
         $this->getService('Task')->deleteTask($taskId);
-
         $this->result = true;
     }
 
+    public function reorderTaskAction() {
+        $order = $this->_getParam('order');
+        $this->getService('Task')->reorderTask($order);
+    }
 }

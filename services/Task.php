@@ -45,7 +45,7 @@ class TaskService extends Service
         $task->estimation = $estimation;
         $task->owner = $owner;
         $task->state = $state;
-        $task->done = $done;
+        $task->done = ($done) ? $done : 0;
         $task->id_project = $projectId;
         $task->id_sprint = ($state == Task::STATE_DETACHED) ? null : $sprintId;
 
@@ -81,8 +81,13 @@ class TaskService extends Service
 
     public function getTasksUpdateDates(array $tasks_ids) {
         $dates = array();
+
+        if(! $tasks_ids)
+            return $dates;
+
         foreach(DAO::get('TaskHistory')->by('id_task', $tasks_ids, array('date ASC')) as $data)
             $dates[] = $data->date;
+
         return $dates;
     }
 }

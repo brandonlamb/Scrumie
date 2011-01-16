@@ -8,6 +8,6 @@ abstract class DbModel extends DataModel
     const TABLE = null;
 
     public function getId() {
-        return $this->data[static::INDEX];
+        return $this->data[self::INDEX];
     }
 }

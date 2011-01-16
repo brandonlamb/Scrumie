@@ -5,10 +5,6 @@ class BoardController extends ScrumieController {
 
     protected $layout = 'logged.phtml';
 
-    public function getCurrentProjectId() {
-        return (int) $_SESSION['projectId'];
-    }
-
     public function indexAction() {
         $sprintId = $this->_getParam('sprint');
 

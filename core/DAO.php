@@ -30,7 +30,9 @@ class DAO {
     }
 
     public function byId($value) {
-        $result = $this->by($this->indexName, $value);
+        if(! $result = $this->by($this->indexName, $value))
+            throw new DAOException(sprintf('%s with id %s dosen\'t exists', $this->modelName, $value));
+
         return $result[0];
     }
 

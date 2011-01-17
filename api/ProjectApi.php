@@ -2,7 +2,7 @@
 
 require_once('./models/Project.php');
 
-class ProjectService extends Service
+class ProjectApi extends Api
 {
     public function registry($name, $password) {
         

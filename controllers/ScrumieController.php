@@ -1,12 +1,12 @@
 <?php
 
-require_once ('./core/Service.php');
+require_once ('./core/Api.php');
 
 class ScrumieControllerException extends Exception {}
 class ScrumieController extends Controller
 {
-    public function getService($name) {
-        return Service::getService($name);
+    public function getApi($name) {
+        return Api::getApi($name);
     }
 
     public function getCurrentProjectId() {

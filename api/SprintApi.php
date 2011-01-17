@@ -4,7 +4,7 @@ require_once ('./models/Sprint.php');
 require_once ('./models/Task.php');
 require_once ('./models/TaskHistory.php');
 
-class SprintService extends Service
+class SprintApi extends Api
 {
     public function fetchAllForProjectId($projectId) {
         return DAO::get('Sprint')->by('id_project', $projectId);
@@ -33,7 +33,7 @@ class SprintService extends Service
 
     public function getSprintUpdateDates($sprintId) {
         $tasks_ids = $this->getAllTaskIdsForSprint($sprintId);
-        $updateDates = $this->getService('Task')->getTasksUpdateDates($tasks_ids);
+        $updateDates = $this->getApi('Task')->getTasksUpdateDates($tasks_ids);
         return $updateDates;
     }
 

@@ -11,17 +11,17 @@ class BoardController extends ScrumieController {
         if(!$this->getCurrentProjectId())
             throw new BoardControllerException('Unathorize access');
 
-        $this->view->sprints = $this->getService('Sprint')->fetchAllForProjectId($this->getCurrentProjectId());
+        $this->view->sprints = $this->getApi('Sprint')->fetchAllForProjectId($this->getCurrentProjectId());
 
-        $this->view->tasks = $this->getService('Task')->fetchTaskForSprint($sprintId);
-        $this->view->detached = $this->getService('Task')->fetchDetached($this->getCurrentProjectId());
-        $this->view->sprintName = ($sprintId) ? $this->getService('Sprint')->getById($sprintId)->name : 'not set';
-        $this->view->btc_y_max = ($sprintId) ? $this->getService('Sprint')->getSprintEstimation($sprintId) + 1 : 0;
-        $this->view->btc_series = ($sprintId) ? join(',',$this->getService('Sprint')->getEstimationForEachSprintDate($sprintId)) : 0;
+        $this->view->tasks = $this->getApi('Task')->fetchTaskForSprint($sprintId);
+        $this->view->detached = $this->getApi('Task')->fetchDetached($this->getCurrentProjectId());
+        $this->view->sprintName = ($sprintId) ? $this->getApi('Sprint')->getById($sprintId)->name : 'not set';
+        $this->view->btc_y_max = ($sprintId) ? $this->getApi('Sprint')->getSprintEstimation($sprintId) + 1 : 0;
+        $this->view->btc_series = ($sprintId) ? join(',',$this->getApi('Sprint')->getEstimationForEachSprintDate($sprintId)) : 0;
 
         $updates = array();
         if($sprintId) {
-        foreach($this->getService('Sprint')->getSprintUpdateDates($sprintId) as $date)
+        foreach($this->getApi('Sprint')->getSprintUpdateDates($sprintId) as $date)
             $updates[] = date('D/d/M', strtotime($date));
         }
 
@@ -38,7 +38,7 @@ class BoardController extends ScrumieController {
         $done = $this->_getParam('done');
         $projectId = $this->getCurrentProjectId();
 
-        $task = $this->getService('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId);
+        $task = $this->getApi('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId);
 
         $this->result = $task->getId();
     }
@@ -46,18 +46,18 @@ class BoardController extends ScrumieController {
     public function addNewSprintAction() {
         $sprintName = $this->_getParam('sprintName');
         $projectId = $this->getCurrentProjectId();
-        $sprint = $this->getService('Sprint')->addNewSprint($sprintName, $projectId);
+        $sprint = $this->getApi('Sprint')->addNewSprint($sprintName, $projectId);
         $this->result = $sprint->getId();
     }
 
     public function deleteTaskAction() {
         $taskId = $this->_getParam('taskId');
-        $this->getService('Task')->deleteTask($taskId);
+        $this->getApi('Task')->deleteTask($taskId);
         $this->result = true;
     }
 
     public function reorderTaskAction() {
         $order = $this->_getParam('order');
-        $this->getService('Task')->reorderTask($order);
+        $this->getApi('Task')->reorderTask($order);
     }
 }

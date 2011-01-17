@@ -1,0 +1,6 @@
+Options +FollowSymlinks
+Options -Indexes
+RewriteEngine On
+
+# Disable all magic quoting.
+php_flag magic_quotes_gpc Off

@@ -100,3 +100,9 @@ function isset(variable) {
         return false;
     return true;
 }
+
+function time() {
+    return Math.floor(new Date().getTime()/1000);
+}
+
+

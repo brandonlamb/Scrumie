@@ -11,6 +11,12 @@
 <script type="text/javascript" src="./layout/scrumie.js"></script>
 <script type="text/javascript" src="./layout/highcharts.js"></script>
 
+<script type="text/javascript">
+    $(document).ready(function() {
+        setInterval("$.get('?controller=Index&action=keepAlive&id='+time())", 1000 * 60 * 3);
+    });
+</script>
+
 <style type="text/css">
     .over {border: 1px dashed red ;}
     .tabContent {padding: 3px; background: #999;}

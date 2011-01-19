@@ -43,20 +43,24 @@ class SprintApi extends Api
 
     public function getEstimationForEachSprintDate($sprintId) {
         $tasks_ids = $this->getAllTaskIdsForSprint($sprintId);
-        $result = array();
-        foreach($tasks_ids as $id) {
-            foreach(DAO::get('TaskHistory')->by('id_task', $id, array('date ASC')) as $data) {
-                if(array_key_exists($data->date, $result))
-                    $result[$data->date] += $data->done;
+        $updateDates = $this->getSprintUpdateDates($sprintId);
+        $sprintEstimation = $this->getSprintEstimation($sprintId);
+
+        $estimation = array();
+        foreach($updateDates as $index => $date) {
+
+            foreach($tasks_ids as $id) {
+                if($done = DAO::query("select done from task_history where id_task = $id and date = '$date'")->pop())
+                    $estimation[$index][$id] = $done->done;
                 else
-                    $result[$data->date] = $data->done;
+                    $estimation[$index][$id] = ($index) ? $estimation[$index-1][$id] : 0;
             }
         }
-        
-        $estimation = $this->getSprintEstimation($sprintId);
 
-        foreach($result as $date => $done)
-            $result[$date] = $estimation - $done;
+        $result = array();
+        foreach($estimation as $index => $values) {
+            $result[$index] = $sprintEstimation - array_sum($values);
+        }
 
         return $result;
     }

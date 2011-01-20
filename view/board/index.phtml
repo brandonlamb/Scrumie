@@ -189,6 +189,9 @@ function prepareTask(Task $task, $draggable = true) {
         <li id="task_done">Set done</li>
         <li id="task_setOwner">Set owner</li>
         <li><hr/></li>
+        <li id="task_attach">Move to sprint</li>
+        <li id="task_detach">Move&nbsp;to&nbsp;backlog</li>
+        <li><hr/></li>
         <li id="task_delete">Delete</li>
     </ul>
 </div>
@@ -227,6 +230,20 @@ function setEditable() {
 
     $('.task').contextMenu("taskMenu", {
         shadow: true, 
+        menuStyle: {
+            width: '150px'
+        },
+        onShowMenu: function(e, menu) {
+            var parent = $(e.currentTarget).parent();
+            if($(parent).attr('id') == 'detached') {
+                $('#task_detach', menu).remove();
+            }
+            else {
+                $('#task_attach', menu).remove();
+            }
+
+            return menu;
+        },
         bindings: {
             'task_estimate': function(t) {
                 var value = prompt('Please enter estimation value');
@@ -273,6 +290,14 @@ function setEditable() {
                             $(t).remove();
                 });
             },
+            'task_attach': function(t) {
+                var task = $(t).appendTo('td#todo');
+                saveTask(task);
+            },
+            'task_detach': function(t) {
+                var task = $(t).appendTo('div#detached');
+                saveTask(task);
+            },
         }
     });
 
@@ -286,8 +311,7 @@ function setEditable() {
 
             $(this).unbind('blur');
             $(this).unbind('focus');
-
-            $(this).blur(function () {
+$(this).blur(function () {
                 saveTask($(this).parent());
             });
 

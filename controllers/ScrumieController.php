@@ -1,6 +1,6 @@
 <?php
 
-require_once ('./core/Api.php');
+require_once (PHP_RABBIT_PATH.'core/Api.php');
 
 class ScrumieControllerException extends Exception {}
 class ScrumieController extends Controller
@@ -19,5 +19,4 @@ class ScrumieController extends Controller
     public function isLogged() {
         return (bool) $this->getCurrentProjectId();
     }
-
 }

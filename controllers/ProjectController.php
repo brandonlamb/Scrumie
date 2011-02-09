@@ -4,13 +4,13 @@ class ProjectController extends ScrumieController
 {
     public function registryAction() {
        $service = $this->getApi('Project');
-       $service->registry($this->_getParam('name'), $this->_getParam('password'));
+       $service->registry($this->getParam('name'), $this->getParam('password'));
        $this->result = true;
     }
 
     public function loginAction() {
-        $name = $this->_getParam('name');
-        $password = $this->_getParam('password');
+        $name = $this->getParam('name');
+        $password = $this->getParam('password');
 
         if(! $projectId = $this->getApi('Project')->authorize($name, $password))
             throw new Exception('Invalid name or password');
@@ -22,6 +22,6 @@ class ProjectController extends ScrumieController
 
     public function logoutAction() {
         session_destroy();
-        $this->_redirect('Index', 'index');
+        $this->redirect('Index', 'index');
     }
 }

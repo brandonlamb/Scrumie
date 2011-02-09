@@ -4,7 +4,7 @@
  * @licence GNU General Public Licence
  * http://scrumie.cjb.net
  */
-define('PHP_RABBIT_PATH', '../../phprabbit/');
+define('PHP_RABBIT_PATH', pathinfo(__FILE__, PATHINFO_DIRNAME).'/phprabbit/');
 require_once (PHP_RABBIT_PATH . 'core/Application.php');
 require_once('./controllers/ScrumieController.php');
 

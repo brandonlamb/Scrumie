@@ -72,11 +72,6 @@ class TaskApi extends Api
 
     public function deleteTask($taskId) {
         DAO::delete('Task', $taskId);
-        $this->deleteTaskHistory($taskId);
-    }
-
-    public function deleteTaskHistory($taskId) {
-        DAO::query("DELETE FROM task_history WHERE id_task = $taskId");
     }
 
     public function getTasksUpdateDates(array $tasks_ids) {

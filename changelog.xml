@@ -3,7 +3,7 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-2.0.xsd
-    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+    http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd" logicalFilePath="changelog.xml">
 
     <changeSet id="1" author="nigro">
         <createTable tableName="project">
@@ -73,6 +73,50 @@
                 <constraints nullable="false"/>
             </column>
         </createTable>
+    </changeSet>
+
+    <changeSet id="5" author="nigro">
+        <comment>
+            Add foregin keys between sprint and task
+        </comment>
+        <addForeignKeyConstraint constraintName="fk_task_id_sprint"
+            baseTableName="task" baseColumnNames="id_sprint"
+            referencedTableName="sprint" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="6" author="nigro">
+        <comment>
+            Add foregin keys between task_history and task
+        </comment>
+        <addForeignKeyConstraint constraintName="fk_task_history_id_task"
+            baseTableName="task_history" baseColumnNames="id_task"
+            referencedTableName="task" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="7" author="nigro">
+        <comment>
+            Add foregin keys between sprint and project
+        </comment>
+        <addForeignKeyConstraint constraintName="fk_sprint_id_project"
+            baseTableName="sprint" baseColumnNames="id_project"
+            referencedTableName="project" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="8" author="nigro">
+        <comment>
+            Add foregin keys between task and project
+        </comment>
+        <addForeignKeyConstraint constraintName="fk_task_id_project"
+            baseTableName="task" baseColumnNames="id_project"
+            referencedTableName="project" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
     </changeSet>
     
 </databaseChangeLog>

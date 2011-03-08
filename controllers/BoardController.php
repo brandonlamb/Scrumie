@@ -29,6 +29,7 @@ class BoardController extends ScrumieController {
     }
 
     public function saveTaskAction() {
+        $projectId = $this->getCurrentProjectId();
         $sprintId = $this->getParam('sprintId');
         $taskId = $this->getParam('taskId');
         $body = $this->getParam('body');
@@ -36,7 +37,6 @@ class BoardController extends ScrumieController {
         $owner = $this->getParam('owner');
         $state = $this->getParam('state');
         $done = $this->getParam('done');
-        $projectId = $this->getCurrentProjectId();
 
         $task = $this->getApi('Task')->saveTask($sprintId, $taskId, $body, $estimation, $owner, $state, $done, $projectId);
 
@@ -62,12 +62,13 @@ class BoardController extends ScrumieController {
     }
 
     public function deleteSprintAction() {
+        Asserts::hasModelValues($this->getApi('Sprint')->getById($this->getParam('id')), array('id_project' => $this->getCurrentProjectId()));
         $this->getApi('Sprint')->deleteSprint($this->getParam('id'));
         $this->result = true;
     }
 
     public function renameSprintAction() {
-        //verify if you are owner of this sprint
+        Asserts::hasModelValues($this->getApi('Sprint')->getById($this->getParam('id')), array('id_project' => $this->getCurrentProjectId()));
         $this->getApi('Sprint')->renameSprint($this->getParam('id'), $this->getParam('name'));
         $this->result = true;
     }

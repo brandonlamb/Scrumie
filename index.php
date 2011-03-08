@@ -7,6 +7,7 @@
 define('PHP_RABBIT_PATH', pathinfo(__FILE__, PATHINFO_DIRNAME).'/phprabbit/');
 require_once (PHP_RABBIT_PATH . 'core/Application.php');
 require_once('./controllers/ScrumieController.php');
+require_once('Asserts.php');
 
 session_start();
 

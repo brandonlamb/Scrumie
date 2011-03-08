@@ -23,6 +23,10 @@ function prepareTask(Task $task, $draggable = true) {
 }
 ?>
 
+<style>
+.sprint .icon {border: 1px solid #ddf; position: relative; top: 2px; display: inline-block; cursor: pointer;}
+</style>
+
 <div id="tabs">
     <ul>
         <li><a href="#tabs-sprints">Sprints</a></li>
@@ -126,7 +130,9 @@ function prepareTask(Task $task, $draggable = true) {
     <ul id="sprints-list">
         <?php
         foreach($this->sprints as $sprint) {
-            echo sprintf('<li><a href="?controller=Board&sprint=%s">%s</a></li>', $sprint->id, $sprint->name);
+            $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
+            $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
+            echo "<li _sprintId='{$sprint->id}' class='sprint'><a style='padding: 2px; margin-right: 10px;' href='?controller=Board&sprint={$sprint->id}'>{$sprint->name}</a>$edit&nbsp;$delete</li>";
         }
         ?>
     </ul>
@@ -311,10 +317,9 @@ function setEditable() {
 
             $(this).unbind('blur');
             $(this).unbind('focus');
-$(this).blur(function () {
+            $(this).blur(function () {
                 saveTask($(this).parent());
             });
-
             $(this).focus(function () {
                 //edit
             });
@@ -371,6 +376,32 @@ function addNewBacklogTask() {
     setEditable();
 }
 
+function deleteSprint(element) {
+    var sprintId = $(element).parent().attr('_sprintId');
+    var name = $(element).parent().children('a').html();
+    if (!confirm('Are you sure you want to delete "' + name + '"?\n\nAll information connected with this sprint will be permamently removed!'))
+        return;
+
+    $.post(uri('Board', 'deleteSprint'), {id: sprintId}, function(data) {
+        if(data == true) {
+            $(element).parent().remove();
+        }
+    })
+}
+
+function editSprint(element) {
+    var sprintId = $(element).parent().attr('_sprintId');
+    var name = $(element).parent().children('a');
+    $(name).attr('contenteditable', true);
+    $(name).focus();
+    $(name).blur(function() {
+        $(this).attr('contenteditable', false);
+        $(this).css('border', '0');
+        $.post(uri('Board', 'renameSprint'), {id: sprintId, name: $(this).html()});
+        $(this).unbind('blur');
+    });
+}
+
 function addNewSprint() {
     var sprintName = prompt('Sprint name');
 
@@ -399,7 +430,6 @@ $(".droppable").droppable({
         saveTask(ui.helper);
     }
 });
-
 
 function updateSummary() {
     var summary = [];

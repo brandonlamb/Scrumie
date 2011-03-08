@@ -101,6 +101,10 @@ function isset(variable) {
     return true;
 }
 
+function uri(controller, action) {
+    return '?controller='+controller+'&action='+action;
+}
+
 function time() {
     return Math.floor(new Date().getTime()/1000);
 }

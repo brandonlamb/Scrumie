@@ -24,6 +24,16 @@ class SprintApi extends Api
         return $sprint;
     }
 
+    public function renameSprint($sprintId, $name) {
+        $sprint = $this->getById($sprintId);
+        $sprint->name = $name;
+        DAO::update($sprint);
+    }
+
+    public function deleteSprint($sprintId) {
+        DAO::delete('Sprint', $sprintId);
+    }
+
     public function getAllTaskIdsForSprint($sprintId) {
         $tasks_ids = array();
         foreach(DAO::get('Task')->by('id_sprint', $sprintId) as $task)

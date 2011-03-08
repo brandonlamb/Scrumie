@@ -6,7 +6,7 @@ class IndexController extends ScrumieController {
 
     public function indexAction() {
         if($this->isLogged())
-            $this->_redirect('Board', 'index');
+            $this->redirect('Board', 'index');
     }
 
     public function keepAliveAction() {

@@ -60,4 +60,15 @@ class BoardController extends ScrumieController {
         $order = $this->getParam('order');
         $this->getApi('Task')->reorderTask($order);
     }
+
+    public function deleteSprintAction() {
+        $this->getApi('Sprint')->deleteSprint($this->getParam('id'));
+        $this->result = true;
+    }
+
+    public function renameSprintAction() {
+        //verify if you are owner of this sprint
+        $this->getApi('Sprint')->renameSprint($this->getParam('id'), $this->getParam('name'));
+        $this->result = true;
+    }
 }

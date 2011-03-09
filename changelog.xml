@@ -86,6 +86,15 @@
         />
     </changeSet>
 
+    <changeSet id="pre-6" author="nigro">
+        <comment>
+            Remove task_history that are not connected to any task
+        </comment>
+        <sql>
+            DELETE FROM task_history WHERE id_task NOT IN (SELECT id FROM task);
+        </sql>
+    </changeSet>
+
     <changeSet id="6" author="nigro">
         <comment>
             Add foregin keys between task_history and task

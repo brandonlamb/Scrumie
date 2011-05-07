@@ -6,10 +6,11 @@
  */
 define('PHP_RABBIT_PATH', pathinfo(__FILE__, PATHINFO_DIRNAME).'/phprabbit/');
 require_once (PHP_RABBIT_PATH . 'core/Application.php');
-require_once('./controllers/ScrumieController.php');
+require_once (PHP_RABBIT_PATH . 'core/BaseRouting.php');
+require_once('./controller/ScrumieController.php');
 require_once('Asserts.php');
 
 session_start();
 
-$App = Application::getInstance('config.ini.php');
-$App->dispatch($App->getControllerName(), $App->getActionName());
+Application::getInstance('config.ini.php');
+FrontController::getInstance()->setRouting('BaseRouting')->dispatch();

@@ -1,7 +1,7 @@
 <?php
 
 define('APP_PATH', pathinfo(__FILE__, PATHINFO_DIRNAME) . '/');   //root path of application
-define('PHP_RABBIT_PATH', APP_PATH . '../../');            //path to phprabbit framework
+define('PHP_RABBIT_PATH', APP_PATH . 'phprabbit/');            //path to phprabbit framework
 set_error_handler('ErrorHandler');                          //All php errors like warning, notice etc will be transformed to FataErrorException
 
 if(! is_readable(PHP_RABBIT_PATH)) {

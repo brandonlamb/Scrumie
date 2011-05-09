@@ -1,6 +1,6 @@
 <?php
 
-class ProjectController extends ScrumieController 
+class ProjectController extends AppController 
 {
     public function registryAction() {
        $service = $this->getApi('Project');

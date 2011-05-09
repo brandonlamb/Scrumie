@@ -3,12 +3,30 @@ SCRUMIE
 Its very simple implementation of scrum board, it can help you with task managment in sprint
 when you don't have access to physical board or you work online.
 
+Requirements: 
+ * PHP 5.3+
+ * http server (eg Apache)
+ * postgresql server
+
 Instalation:
 
-    requirements: 
-     * PHP 5.3+
-     * http server (eg Apache)
+go to you working dir eg /var/www
 
-    database:
-     - Use liquibase to create database structure
-       cd ./liquibase && java -jar liquibase.jar update
+    cd /var/www
+
+download scrumie
+
+    git clone https://github.com/nigro/Scrumie.git Scrumie & cd Scrumie
+
+create empty postgresql database with utf8 encoding, you can use psql or pgAdmin whatever you want
+
+after that create your own configuration file based on distribution config file
+
+    cp config.ini.dist config.ini
+
+run database migration
+
+    ./cli.php task/LiquibaseUpdate.php
+
+If everything goes well you will see communicate: Liquibase Update Successful
+After that you can open web browser with address: http://localhost/Scrumie

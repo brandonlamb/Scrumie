@@ -1,8 +1,5 @@
 <?php
 
-require_once ('./models/Task.php');
-require_once ('./models/TaskHistory.php');
-
 class TaskApi extends Api
 {
     public function fetchTaskForSprint($sprintId) {

@@ -1,9 +1,5 @@
 <?php
 
-require_once ('./models/Sprint.php');
-require_once ('./models/Task.php');
-require_once ('./models/TaskHistory.php');
-
 class SprintApi extends Api
 {
     public function fetchAllForProjectId($projectId) {

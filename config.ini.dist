@@ -1,0 +1,10 @@
+<?php exit; ?>
+database.driver=postgresql
+database.name=scrumie
+database.host=localhost
+database.port=5432
+database.user=<username>
+database.password=<password>
+
+liquibase.context=all
+liquibase.changeLogFile=changelog.xml

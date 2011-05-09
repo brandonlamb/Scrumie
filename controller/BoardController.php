@@ -1,7 +1,7 @@
 <?php
 
-class BoardControllerException extends ScrumieControllerException {}
-class BoardController extends ScrumieController {
+class BoardControllerException extends AppControllerException {}
+class BoardController extends AppController {
 
     public $layout = 'logged.phtml';
 
@@ -62,13 +62,15 @@ class BoardController extends ScrumieController {
     }
 
     public function deleteSprintAction() {
-        Asserts::hasModelValues($this->getApi('Sprint')->getById($this->getParam('id')), array('id_project' => $this->getCurrentProjectId()));
+        if($this->getApi('Sprint')->getById($this->getParam('id'))->id_project != $this->getCurrentProjectId())
+            throw new BoardControllerException(sprintf('You can delete sprint only from current selected projects'));
         $this->getApi('Sprint')->deleteSprint($this->getParam('id'));
         $this->result = true;
     }
 
     public function renameSprintAction() {
-        Asserts::hasModelValues($this->getApi('Sprint')->getById($this->getParam('id')), array('id_project' => $this->getCurrentProjectId()));
+        if($this->getApi('Sprint')->getById($this->getParam('id'))->id_project != $this->getCurrentProjectId())
+            throw new BoardControllerException(sprintf('You can rename sprint only from current selected projects'));
         $this->getApi('Sprint')->renameSprint($this->getParam('id'), $this->getParam('name'));
         $this->result = true;
     }

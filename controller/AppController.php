@@ -1,9 +1,7 @@
 <?php
 
-require_once (PHP_RABBIT_PATH.'core/Api.php');
-
-class ScrumieControllerException extends Exception {}
-class ScrumieController extends Controller
+class AppControllerException extends Exception {}
+class AppController extends Controller
 {
     public function getApi($name) {
         return Api::getApi($name);

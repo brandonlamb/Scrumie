@@ -1,6 +1,6 @@
 <?php
 
-class IndexController extends ScrumieController {
+class IndexController extends AppController {
 
     public $layout = 'default.phtml';
 

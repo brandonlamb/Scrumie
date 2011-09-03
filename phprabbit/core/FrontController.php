@@ -39,6 +39,7 @@ class FrontController {
 
         try {
             $ControllerCalled->calledMethod = $action_name;
+            $ControllerCalled->view->setTemplateFile($this->Routing->action . '.phtml');
             $ControllerCalled->preDispatch();
             $ControllerCalled->$action_name();
             $ControllerCalled->postDispatch();

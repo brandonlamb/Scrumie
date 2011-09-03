@@ -30,11 +30,10 @@ abstract class Controller {
         if($this->context == 'html') {
             header('Content-type: text/html');
             $output = $this->view->render();
-
             if($this->layout && !Request::getInstance()->isAjax()) {
                 $layout = new View;
                 $layout->setTemplateFile($this->layout);
-                $layout->setTemplateDir('layout/');
+                $layout->setTemplateDir(APP_PATH.'/layout/');
                 $layout->content = $output;
                 $output = $layout->render();
             }
@@ -56,6 +55,7 @@ abstract class Controller {
     }
 
     public function redirect($controller, $action) {
+        //todo ajax redirect
         $fronController = FrontController::getInstance();
         $fronController->Routing->controller = $controller;
         $fronController->Routing->action = $action;

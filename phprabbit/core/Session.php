@@ -25,6 +25,10 @@ class Session {
         return $this->data[$name];
     }
 
+    static public function destroy() {
+        session_destroy();
+    }
+
     static public function set($name, $value) {
         return self::getInstance()->_set($name, $value);
     }
@@ -32,5 +36,6 @@ class Session {
     static public function get($name) {
         return self::getInstance()->_get($name);
     }
+
 }
 

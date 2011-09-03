@@ -10,6 +10,8 @@ class SimplePathRouting extends Routing implements RoutingInterface {
 
     public function __construct() {
         $uri = $_SERVER['REQUEST_URI'];
+
+        $uri = preg_replace('/\?.*/', '', $uri);
         $path = explode('/',$uri);
 
         if(count($path) == 2 ) {

@@ -97,13 +97,10 @@ class DAO {
     public function fetch($sql, array $order = array(), $limit = null) {
         $order = ($order) ? ' ORDER BY '.join(',', $order) : '';
         $limit = ($limit) ? " LIMIT $limit" : '';
-        $collection = array();
+        $collection = new $this->collectionName;
 
         if($result = self::query($sql.$order.$limit)) {
             if($data = $result->fetchAll()) {
-                if(class_exists($this->collectionName))
-                    $collection = new $this->collectionName;
-
                 foreach($data as $object)
                     $collection[] = new $this->modelName($object);
             }
@@ -158,7 +155,7 @@ class DAO {
         return join(',', $result);
     }
 
-    public function delete($modelName, $id) {
+    static public function delete($modelName, $id) {
         $adapter = new self($modelName);
         $sql = sprintf("DELETE FROM \"%s\" WHERE %s = '%s'", $adapter->tableName, $adapter->indexName, $id);
         self::query($sql);

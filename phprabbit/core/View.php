@@ -45,4 +45,41 @@ class View {
     public function setTemplateDir($path) {
         $this->_template_dir = $path;
     }
+
+    public function _echo($body, $model) {
+        $properties = get_object_vars($model); 
+        foreach($properties as $key => $value) {
+            if(is_scalar($value))
+                $body = str_replace('{'.$key.'}', $value, $body);
+        }
+        echo $body;
+    }
+
+    public function getPublicDir() {
+        return 'http://'.$_SERVER['HTTP_HOST'].'/public/';
+    }
+
+    public function css($name) {
+        if ( preg_match('#http[s]?://#', $name) ) {
+            echo '<link href="'.$name.'" rel="stylesheet" type="text/css"/>';
+        } else  {
+            echo '<link href="'.($this->getPublicDir().$name).'" rel="stylesheet" type="text/css"/>';
+        }
+    }
+
+    public function favicon($name) {
+        if ( preg_match('#http[s]?://#', $name) ) {
+            echo '<link href="'.$name.'" rel="shortcut icon"/>';
+        } else {
+            echo '<link href="'.($this->getPublicDir().$name).'" rel="shortcut icon"/>';
+        }
+    }
+
+    public function script($name) {
+        if ( preg_match('#http[s]?://#', $name) ) {
+            echo '<script type="text/javascript" src="'.$name.'"></script>';
+        } else {
+            echo '<script type="text/javascript" src="'.($this->getPublicDir().$name).'"></script>';
+        }
+    }
 }

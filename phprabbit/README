@@ -1,6 +1,15 @@
 PHPRabbit
 ------------------------------
-Very simple mvc framework written in PHP.
+Simple mvc framework for PHP
 
-Used by: 
-    - http://scrumie.cjb.net
+Get started:
+
+git clone git://github.com/nigro/phprabbit.git phprabbit & cd phprabbit
+./cli.php task/CreateProject name=MyFirstProject
+cd project/MyFirstProject
+
+cd /var/www/
+ln -s phprabbit/project/MyFistProject
+
+goto: 
+http://localhost/MyFirstProject

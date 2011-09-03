@@ -12,14 +12,40 @@ abstract class DbModel extends DataModel
         return $this->data[constant(get_class($this).'::INDEX')];
     }
 
+    public function setId($value) {
+        $this->data[constant(get_class($this).'::INDEX')] = $value;
+    }
+
+    static public function getModelName() {
+        return get_called_class();
+    }
+
+    public function save() {
+        if($this->getId() === null)
+            $this->setId(DAO::insert($this));
+        else 
+            return DAO::update($this);
+    }
+
+    public function delete() {
+        return DAO::delete(get_class($this), $this->getId());
+    }
+
     public function __get($name) {
         $val = parent::__get($name);
 
         if($val instanceof Relation) {
-            $val = DAO::get($val->name)->byId($this->{$val->index});
-            $this->$name = $val;
+            foreach($val->keyConstraints as $fk => $pkey) {
+                $val->keyConstraints[$fk] = $this->{$pkey};
+            }
+
+            $data = DAO::get($val->relationName)->by($val->keyConstraints);
+            if($val->oneToOne) {
+                $data = current($data);
+            }
+            $this->$name = $data;
+            $val = $data;
         }
-        
         return $val;
     }
 
@@ -34,5 +60,16 @@ abstract class DbModel extends DataModel
             $this->$className = $result;
         }
         return $result;
+    }
+
+    static public function getBy($column, $value = null) {
+        return DAO::get(self::getModelName())->by($column,$value);
+    }
+
+    static public function getById($id) {
+        if(! $model = DAO::get(self::getModelName())->byId($id))
+            return false;
+
+        return $model;
     }
 }

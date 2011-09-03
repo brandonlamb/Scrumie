@@ -4,19 +4,27 @@ require_once(PHP_RABBIT_PATH.'core/Api.php');
 class AppControllerException extends Exception {}
 class AppController extends Controller
 {
-    public function getApi($name) {
-        require_once(APP_PATH . "api/${name}Api.php");
-        return Api::getApi($name);
+    public function isLogged() {
+        return (Session::get('login')) ? true : false;
+    }
+
+    public function getCurrentUser() {
+        $user = User::getBy(array('login'=>Session::get('login')));
+        if(! $user->count()) {
+            throw new AppControllerException('Not logged');
+        }
+        return current($user);
     }
 
     public function getCurrentProjectId() {
-        if (! isset($_SESSION['projectId']) )
-            return false;
-
-        return (int) $_SESSION['projectId'];
+        return Session::get('project');
     }
 
-    public function isLogged() {
-        return (bool) $this->getCurrentProjectId();
+    public function getCurrentSprintId() {
+        return Session::get('sprint');
+    }
+
+    public function getCurrentProject() {
+        return Project::getById($this->getCurrentProjectId());
     }
 }

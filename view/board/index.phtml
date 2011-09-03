@@ -21,25 +21,94 @@ function prepareTask(Task $task, $draggable = true) {
 
     return sprintf($taskHelper, $task->id, $draggable, $task->body, $task->estimation, $task->done, $task->owner);
 }
+
 ?>
 
 <style>
 .sprint .icon {border: 1px solid #ddf; position: relative; top: 2px; display: inline-block; cursor: pointer;}
+div#tabs ul li {height: 28px;}
+table.home td {border: 0;}
+table.home th {width: 100px; text-align: right;}
+fieldset {margin-bottom: 20px; border: 1px solid #ddd; border-top: 2px solid #999; border-left: 0; padding: 0;}
+fieldset legend {padding-right: 10px;}
+.projectName {margin-left: 5px; display: inline-block; padding: 5px; padding-left: 10px; padding-right: 10px; background: #eee; border-radius: 5px; cursor: pointer;}
+.projectName:hover {background: lightgreen}
+.selected {background: lightgreen}
+.href {cursor: pointer;}
+.href:hover {text-decoration: underline;}
 </style>
 
 <div id="tabs">
     <ul>
-        <li><a href="#tabs-sprints">Sprints</a></li>
-        <li><a href="#tabs-board">Board</a></li>
+        <li><a href="#tabs-home"><img src="http://cdn1.iconfinder.com/data/icons/gnomeicontheme/16x16/actions/redhat-home.png"></a></li>
+        <?php if(isset($this->sprint)): ?>
+        <li><a href="#tabs-board"><?= $this->sprint->name; ?></a></li>
         <li><a href="#tabs-burndownchart">Burn down chart</a></li>
+        <?php endif ?>
+        <?php if(isset($this->project)): ?>
         <li><a href="#tabs-backlog">Backlog</a></li>
-        <li><a onclick="location.href = '?controller=Project&action=logout'">Logout</a></li>
+        <?php endif ?>
+        <li><a onclick="location.href = uri('User', 'logout');">Logout</a></li>
     </ul>
 
+    <div id="tabs-home" class="tabContent">
+        <table class="home">
+            <tr><th>Welcome!</th><td style="font-weight: bold; font-size: 18px;"><?= $this->user->login; ?></td></tr>
+            <tr>
+                <th>Your email:</th>
+                <td>
+                    <input id="userEmail" value="<?= $this->user->email; ?>" name="email" type="text" readonly title="double click to edit" ondblclick="$(this).attr('readonly', false)" onchange="emailChange()" onblur="$(this).attr('readonly', true);" style="width: 300px; border:0; border-bottom: 1px dashed gray; background: trasparent; padding: 2px;">
+                </td>
+            </tr>
+            <tr>
+                <th style="vertical-align: top">Projects:</th>
+                <td>
+                    <div style="margin-bottom: 10px;">
+                        <button style="margin-right: 10px;" title="Add new project" onclick="addNewProject()">Add new project</button>
+                        <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: inline-block; padding: 5px; background: #ddd; border-radius: 4px; margin-left: 20px;">
+                        Import:
+                        <input placeholder="Project name" name="project" type="text">
+                        <input placeholder="Project password" name="password" type="password">
+                        <button style="margin-right: 10px;" onclick="importProject()">Import project</button>
+                        </div>
+                    </div>
+                    <?php
+                    $projects = array();
+                    foreach($this->user->projects as $userProject) {
+                        $project = $userProject->project;
+                        $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
+                        $projects[] = '<span onclick="selectProject(this);" class="projectName '.$class.'" data-projectId="'.$project->id.'">'.$project->name.'</span>';
+                    }
+                    echo join('', $projects);
+                    ?>
+                </td>
+            </tr>
+
+            <?php if(isset($this->project)): ?>
+            <tr><th style="vertical-align: top;" >Spints:</th>
+                <td style="padding: 0">
+                    <fieldset>
+                        <legend><button title="Add new sprint" onclick="addNewSprint()">+</button></legend>
+                        <ul id="sprints-list">
+                            <?php
+                            foreach($this->project->sprints as $sprint) {
+                                $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
+                                $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
+                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span class='href' style='padding: 2px; margin-right: 10px;' onclick='selectSprint($sprint->id)'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
+                            }
+                            ?>
+                        </ul>
+                    </fieldset>
+                </td>
+            </tr>
+            <?php endif ?>
+        </table>
+    </div>
+
+    <?php if(isset($this->sprint)): ?>
     <div id="tabs-board" class="tabContent">
         <div class="helpers">
             <button onclick="addNewTask();">+ Add new task</button>
-            <div id="sprintTitle"><?= $this->sprintName; ?></div>
         </div>
         <table id="board" class="round4">
             <tr>
@@ -87,57 +156,45 @@ function prepareTask(Task $task, $draggable = true) {
             <tr>
                 <td id="todo" class="droppable">
                 <?php
-                    foreach($this->tasks['todo'] as $task) {
+                    foreach($this->sprint->tasks->getTodo() as $task) {
                         echo prepareTask($task);
                     }
                 ?>
                 </td>
                 <td id="inProgress" class="droppable">
                 <?php
-                    foreach($this->tasks['inProgress'] as $task) {
+                    foreach($this->sprint->tasks->getInProgress() as $task) {
                         echo prepareTask($task);
                     }
                 ?>
                 </td>
                 <td id="commited" class="droppable">
                 <?php
-                    foreach($this->tasks['commited'] as $task) {
+                    foreach($this->sprint->tasks->getCommited() as $task) {
                         echo prepareTask($task);
                     }
                 ?>
                 </td>
                 <td id="readyForTest" class="droppable">
                 <?php
-                    foreach($this->tasks['readyForTest'] as $task) {
+                    foreach($this->sprint->tasks->getReadyForTest() as $task) {
                         echo prepareTask($task);
                     }
                 ?>
                 </td>
                 <td id="done" class="droppable">
                 <?php
-                    foreach($this->tasks['done'] as $task) {
+                    foreach($this->sprint->tasks->getDone() as $task) {
                         echo prepareTask($task);
                     }
                 ?>
                 </td>
             </tr>
         </table>
-
     </div>
+    <?php endif ?>
 
-    <div id="tabs-sprints" class="tabContent">
-    <button onclick="addNewSprint()">+ Add new sprint</button>
-    <ul id="sprints-list">
-        <?php
-        foreach($this->sprints as $sprint) {
-            $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
-            $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
-            echo "<li _sprintId='{$sprint->id}' class='sprint'><a style='padding: 2px; margin-right: 10px;' href='?controller=Board&sprint={$sprint->id}'>{$sprint->name}</a>$edit&nbsp;$delete</li>";
-        }
-        ?>
-    </ul>
-    </div>
-
+    <?php if(isset($this->sprint)): ?>
     <div id="tabs-burndownchart" class="tabContent">
     <button onclick="reloadBtc()">Redraw</button>
     <div style="width: 90%" id="burndownchart-container"></div>
@@ -149,12 +206,12 @@ function prepareTask(Task $task, $draggable = true) {
                  renderTo: 'burndownchart-container'
               },
               xAxis: {
-                categories: [<?= $this->btc_x_categories?>]
+                categories: [<?= '"'.join('","', $this->sprint->tasks->getAllTasksUpdateDates('D/d/M')).'"'; ?>]
               },
               yAxis: {
                  title: {text: 'Estimation points'},
                  min: 0,
-                 max: <?= $this->btc_y_max ?>,
+                 max: <?= $this->sprint->tasks->getEstimationSum() ?>,
               },
               title: {
                  text: 'Burndown chart'
@@ -162,7 +219,7 @@ function prepareTask(Task $task, $draggable = true) {
               tooltip: { formatter: function() { return this.y +' points' } },
               series: [{
                  name: 'Points left',
-                 data: [<?= $this->btc_series ?>],
+                 data: [<?= join(",", $this->sprint->getEstimationForEachSprintDate()) ?>],
                  marker: {
                     radius: 4
                  }
@@ -175,17 +232,21 @@ function prepareTask(Task $task, $draggable = true) {
         }
     </script>
     </div>
+    <?php endif ?>
 
+    <?php if(isset($this->project)): ?>
     <div id="tabs-backlog" class="tabContent">
         <button onclick="addNewBacklogTask();">+ Add new task</button>
         <div class="sortable" id="detached">
             <?php
-                foreach($this->detached as $task) {
+                 foreach($this->project->tasks->getDetached() as $task) {
                     echo prepareTask($task, false);
                 }
             ?>
         </div>
     </div>
+    <?php endif ?>
+
 </div>
 
 <!-- task context menu -->
@@ -222,7 +283,7 @@ function setSortable() {
                 order[index] = $(element).attr('id');
             });
 
-            $.post('?controller=Board&action=reorderTask', {'order': order}, function(data, status, Request) {
+            $.post(uri('Project','reorderTask'), {'order': order}, function(data, status, Request) {
             });
         }
     });
@@ -291,7 +352,7 @@ function setEditable() {
                 if (! confirm('Are you sure you want to delete this task') )
                     return;
 
-                $.post('?controller=Board&action=deleteTask', {taskId: $(t).attr('id')}, function(data, status, Request) {
+                $.post(uri('Project','deleteTask'), {taskId: $(t).attr('id')}, function(data, status, Request) {
                         if(data)
                             $(t).remove();
                 });
@@ -340,11 +401,11 @@ function saveTask(task) {
         estimation: $(task).children('span.estimation').html(),
         done: $(task).children('span.done').html(),
         owner: $(task).children('span.owner').html(),
-        sprintId: $.getUrlVar('sprint'),
+        sprintId: $(task).attr('data-sprintId'),
         state: $(task).parent().attr('id')
     };
 
-    $.post('?controller=Board&action=saveTask', params, function(data, status, Request) {
+    $.post(uri('Project', 'saveTask'), params, function(data, status, Request) {
         if(data)
             $(task).attr('id', data)
         else
@@ -355,7 +416,7 @@ function saveTask(task) {
 }
 
 function addNewTask() {
-    var taskHtml = '<div id="" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation">1</span>&nbsp;<span class="done">0</span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
+    var taskHtml = '<div id="" data-sprintId="<?= (isset($this->sprint)) ? $this->sprint->id : '';?>" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation">1</span>&nbsp;<span class="done">0</span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
     var task = $(taskHtml).appendTo('td#todo');
     setEditable();
     setDraggable();
@@ -376,13 +437,19 @@ function addNewBacklogTask() {
     setEditable();
 }
 
+function emailChange() {
+    var email = $('input#userEmail').val();
+    $.post(uri('User', 'changeEmail'), {email: email}, function(data) {
+    });
+}
+
 function deleteSprint(element) {
-    var sprintId = $(element).parent().attr('_sprintId');
+    var sprintId = $(element).parent().attr('data-sprintId');
     var name = $(element).parent().children('a').html();
     if (!confirm('Are you sure you want to delete "' + name + '"?\n\nAll information connected with this sprint will be permamently removed!'))
         return;
 
-    $.post(uri('Board', 'deleteSprint'), {id: sprintId}, function(data) {
+    $.post(uri('Project', 'deleteSprint'), {id: sprintId}, function(data) {
         if(data == true) {
             $(element).parent().remove();
         }
@@ -390,35 +457,55 @@ function deleteSprint(element) {
 }
 
 function editSprint(element) {
-    var sprintId = $(element).parent().attr('_sprintId');
+    var sprintId = $(element).parent().attr('data-sprintId');
     var name = $(element).parent().children('a');
     $(name).attr('contenteditable', true);
     $(name).focus();
     $(name).blur(function() {
         $(this).attr('contenteditable', false);
         $(this).css('border', '0');
-        $.post(uri('Board', 'renameSprint'), {id: sprintId, name: $(this).html()});
+        $.post(uri('Project', 'renameSprint'), {id: sprintId, name: $(this).html()});
         $(this).unbind('blur');
     });
 }
 
 function addNewSprint() {
-    var sprintName = prompt('Sprint name');
+    var name = prompt('Sprint name');
 
-    if(sprintName == null)
+    if(name == null)
         return
 
-    if(sprintName == '') {
+    if(name == '') {
         alert('Sprint name can\'t be empty');
         addNewSprint();
     }
-    else
-    {
-        $.post('?controller=Board&action=addNewSprint', {'sprintName': sprintName}, function(data, status, Request) {
-            if(isNaN(parseInt(data)))
-                alert(data)
+    else {
+        $.post(uri('Project','addNewSprint'), {'name': name}, function(data, status, Request) {
+            if(data === true)
+                window.location.reload();
             else
-                location.href = '?controller=Board';
+                alert(data.error);
+        });
+    }
+}
+
+function addNewProject() {
+    var name = prompt('Project name');
+
+    if(name == null)
+        return
+
+    if(name == '') {
+        alert('Project name can\'t be empty');
+        addNewProject();
+    }
+    else {
+        $.post(uri('Project', 'addProject'), {'name': name}, function(data, status, Request) {
+            if(data === true) {
+                window.location.reload();
+            } else {
+                alert(data.error);
+            }
         });
     }
 }
@@ -473,6 +560,29 @@ function updateSummary() {
     $('span#done-sum-done').html(summary['done'].done);
 }
 
+function selectProject(el) {
+    var projectId = $(el).attr('data-projectId');
+    location.href = uri('Board', 'project') + '&id=' + projectId;
+}
+
+function selectSprint(id) {
+    location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
+}
+
+
+function importProject() {
+    $.post(uri('Project','import'), {
+        project: $('#importProject input[name=project]').val(), 
+        password: $('#importProject input[name=password]').val()
+    }, function(data, status, Request) {
+        if(data === true) {
+            window.location.href = uri('Board', 'project');
+        } else {
+            alert(data.error);
+        }
+    });
+
+}
 
 $(function() {
     $( "#tabs" ).tabs();
@@ -489,7 +599,6 @@ $(function() {
     $("table#board").css('height', ($(window).height() - 120));
 
     updateSummary();
-
 });
 
 </script>

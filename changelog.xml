@@ -127,5 +127,44 @@
             onDelete="CASCADE" onUpdate="CASCADE"
         />
     </changeSet>
+
+    <changeSet id="9" author="nigro">
+        <createTable tableName="user">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="login" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="password" type="varchar(32)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="email" type="varchar(1000)">
+                <constraints nullable="true"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="user" columnNames="email" constraintName="uq_user_email"/>
+        <addUniqueConstraint tableName="user" columnNames="login" constraintName="uq_user_login"/>
+        <addUniqueConstraint tableName="user" columnNames="login,email" constraintName="uq_user_login_email"/>
+    </changeSet>
+
+    <changeSet id="10" author="nigro">
+        <createTable tableName="user_project">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_user" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="id_project" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addUniqueConstraint tableName="user_project" columnNames="id_user,id_project" constraintName="uq_user_project_id_user_id_project"/>
+    </changeSet>
+
+    <changeSet id="11" author="nigro">
+        <dropNotNullConstraint tableName="project" columnName="password"/>
+    </changeSet>
     
 </databaseChangeLog>

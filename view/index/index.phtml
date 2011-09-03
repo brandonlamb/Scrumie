@@ -1,62 +1,82 @@
 <style>
     .dialog {display: none;}
     input.text {width: 180px;}
+    .hidden {display: none;}
+    #registryDialog {margin-top: 10px;}
+    .loginDialog div.ui-dialog-titlebar {display: none;}
 </style>
 <center>
 <div id="loginDialog" class="dialog">
     <form id="loginForm" onsubmit="return false;">
     <table>
-    <tr><td>Project:</td><td><input class="text" name="name" type="text"/></td></tr>
+    <tr><td>Login:</td><td><input class="text" name="login" type="text"/></td></tr>
     <tr><td>Password:</td><td><input class="text" name="password" type="password"/></td></tr>
-    <tr><td></td><td style="text-align: right"><input type="submit" value="Go!" /></td></tr>
+    <tr><td></td><td style="text-align: right"><a style="margin-right: 10px;" href="javascript: showRegistryDialog();">Create account</a><input type="submit" value="Login" /></td></tr>
     </table>
-    <a href="javascript: showRegistryDialog();">+ New project</a> 
-    <br/><small>You can also login to demo project as demo:demo</small>
+    <div style="font-size: 11px;">
+
+    <strong>What next</strong>
+    <ul style="margin: 2px">
+        <li>Additional colors for sticky notes</li>
+        <li>Add user stories</li>
+        <li>Public link for project</li>
+    </ul>
+
+    <strong>3.09.2011</strong>
+    <ul style="margin: 2px">
+        <li>Change project login to user login (If you have projects already create new user account then import your projects to it)</li>
+    </ul>
+    </div>
     <br/><small><a href="https://github.com/nigro/Scrumie">http:://github.com/nigro/Scrumie</a></small>
-
-
-
     </form>
 
-</div>
 
-<div id="registryDialog" class="dialog">
-    <form id="registryForm" onsubmit="return false;">
-        <table>
-            <tr><td>Name:</td><td><input class="text" name="name" type="text"/></td></tr>
-            <tr><td>Password:</td><td><input class="text" name="password" type="password"/></td></tr>
-            <tr><td>Repeat&nbsp;pwd:</td><td><input class="text" name="password2" type="password"/></td></tr>
-            <tr><td></td><td style="text-align: right"><input type="submit" value="Create" /></td></tr>
-        </table>
-    </form>
+
+
+    <div id="registryDialog" class="hidden">
+        <form id="registryForm" onsubmit="return false;">
+            <table>
+                <tr><td>Login:</td><td><input class="text" name="login" type="text"/></td></tr>
+                <tr><td>Password:</td><td><input class="text" name="password" type="password"/></td></tr>
+                <tr><td>Repeat&nbsp;pwd:</td><td><input class="text" name="password2" type="password"/></td></tr>
+                <tr><td></td><td style="text-align: right"><input type="submit" value="Create" /></td></tr>
+            </table>
+        </form>
+    </div>
+
 </div>
 </center>
-
 
 <script>
 $(document).ready(function() {
     showLoginDialog();
 
-    $('div#registryDialog input[type|="submit"]').click(function() {
+    $('form#registryForm input[type="submit"]').click(function() {
         var formData = $('form#registryForm').serializeArray();
-        $.post('?controller=Project&action=registry', formData, function(data, textStatus, Request) {
-            if(isset(data.error)) {
+        $.post(uri('User', 'registry'), formData, function(data, textStatus, Request) {
+            if(data === true) {
+                $('#loginForm input[name=login]').val($('#registryForm input[name=login]').val());
+                $('#loginForm input[name=password]').val($('#registryForm input[name=password]').val());
+                $('#loginForm input[type=submit]').click();
+                alert("Registration success.\nYou can now login to your account");
+            }
+            else {
                 alert(data.error)
             }
-            else
-                location.href = '?controller=Index';
         });
 
         return false;
     });
 
-    $('div#loginDialog input[type|="submit"]').click(function() {
+    $('form#loginForm input[type="submit"]').click(function() {
         var formData = $('form#loginForm').serializeArray();
-        $.post('?controller=Project&action=login', formData, function(data, textStatus, Request) {
-            if(data === true)
-                location.href = '?controller=Board';
-            else
+        $.post(uri('User', 'login'), formData, function(data, textStatus, Request) {
+            if(data === true) {
+                location.href = uri('Board', 'index');
+            }
+            else {
                 alert('Authorization failed');
+            }
         });
 
         return false;
@@ -64,21 +84,15 @@ $(document).ready(function() {
 });
 
 function showLoginDialog() {
-
     loginDialog = $( "#loginDialog" ).dialog({
-        title: 'Login',
         closeOnEscape: false,
         draggable: false,
         resizable: false,
+        dialogClass: 'loginDialog',
     });
 }
 
 function showRegistryDialog() {
-    $( "#registryDialog" ).dialog({
-        title: 'New project',
-        closeOnEscape: true,
-        draggable: false,
-        resizable: false,
-    });
+    $( "#registryDialog" ).removeClass('hidden');
 }
 </script>

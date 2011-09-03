@@ -33,6 +33,12 @@ class Task extends DbModel
         'id_project' => null,
     );
 
+    protected $history;
+
+    public function _init() {
+        $this->history = new Relation('TaskHistory', array('id_task'=>'id'));
+    }
+
     public function __set_state($value) {
         if(!in_array($value, self::$availablesStates))
             throw new InvalidArgumentException("Invalid state for task $value");
@@ -40,7 +46,45 @@ class Task extends DbModel
         $this->data['state'] = $value;
     }
 
+    public function isTodo() {
+        return ($this->state == self::STATE_TODO) ? true : false;
+    }
+
+
+    public function isInProgress() {
+        return ($this->state == self::STATE_INPROGRESS) ? true : false;
+    }
+
+    public function isCommited() {
+        return ($this->state == self::STATE_COMMITED) ? true : false;
+    }
+
+    public function isReadyForTest() {
+        return ($this->state == self::STATE_READYFORTEST) ? true : false;
+    }
+
+    public function isDone() {
+        return ($this->state == self::STATE_DONE) ? true : false;
+    }
+
+    public function isDetached() {
+        return ($this->state == self::STATE_DETACHED) ? true : false;
+    }
+
     public function getHistory() {
         return TaskHistory::fetchBy('task_id', $this->id);
+    }
+
+    public function save() {
+        $result = parent::save();
+        $this->saveStateToHistory();
+        return $result;
+    }
+
+    public function saveStateToHistory() {
+        $today = date('Y-m-d 00:00:00', time());
+        $taskHistory = TaskHistory::getIfExistsOrCreateNewOne($this->id, $today);
+        $taskHistory->done = $this->done;
+        $taskHistory->save();
     }
 }

@@ -12,10 +12,12 @@ class TaskHistory extends DbModel
     const INDEX = 'id';
 
     static public function getIfExistsOrCreateNewOne($taskId, $date) {
+        $result = self::getBy(array('id_task' => $taskId, 'date'=>$date));
+
         $result = DAO::get(__CLASS__)->by(array('id_task' => $taskId, 'date' => $date));
 
-        if($result)
-            $taskHistory = $result[0];
+        if($result->count())
+            $taskHistory = current($result);
         else
             $taskHistory = new self;
 

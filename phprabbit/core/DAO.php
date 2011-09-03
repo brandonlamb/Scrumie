@@ -65,7 +65,8 @@ class DAO {
     }
 
     public function exists(array $columns) {
-        return ($this->fetchBy($columns, array(), 1)) ? true : false;
+        $collection = $this->fetchBy($columns, array());
+        return ($collection->count()) ? true : false;
     }
 
     public function count(array $columns) {

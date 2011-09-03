@@ -20,7 +20,7 @@ class Session {
 
     public function _get($name) {
         if(!array_key_exists($name, $this->data))
-            throw new SessionException("Varialbe '$name' isn't registered in current session");
+            return null;
 
         return $this->data[$name];
     }

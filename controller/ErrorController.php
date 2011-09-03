@@ -3,7 +3,7 @@
 class ErrorController extends Controller {
     public $layout = 'default.phtml';
 
-    public function index(Exception $e) {
+    public function indexAction(Exception $e) {
         $this->view->error = $e;
         $this->view->errorInfo = 'no suggestion for solution :(';
         $this->result = array('error' => $e->getMessage()); //this is for ajax call

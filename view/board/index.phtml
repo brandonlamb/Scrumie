@@ -29,9 +29,30 @@ function prepareTask(Task $task, $draggable = true) {
 div#tabs ul li {height: 28px;}
 table.home td {border: 0;}
 table.home th {width: 100px; text-align: right;}
-fieldset {margin-bottom: 20px; border: 1px solid #ddd; border-top: 2px solid #999; border-left: 0; padding: 0;}
-fieldset legend {padding-right: 10px;}
-.projectName {margin-left: 5px; display: inline-block; padding: 5px; padding-left: 10px; padding-right: 10px; background: #eee; border-radius: 5px; cursor: pointer;}
+fieldset {
+    margin-bottom: 20px; 
+    border: 0px solid #ddd; 
+    border-top: 1px solid #999; 
+    border-left: 0; 
+    border-bottom: 0; 
+    padding: 0;
+    border-radius: 5px;
+    background-image: -webkit-gradient(
+        linear,
+        left bottom,
+        left top,
+        color-stop(0.20, rgb(252,252,252)),
+        color-stop(0.72, rgb(240,240,240))
+    );
+
+}
+fieldset legend {
+    border-radius: 5px;
+    border: 1px solid lightgray;
+    background: #eee;
+}
+
+.projectName {margin-left: 5px; display: inline-block; padding: 5px; padding-left: 20px; padding-right: 20px; background: #eee; border-radius: 5px; cursor: pointer;}
 .projectName:hover {background: lightgreen}
 .selected {background: lightgreen}
 .href {cursor: pointer;}
@@ -53,42 +74,70 @@ fieldset legend {padding-right: 10px;}
 
     <div id="tabs-home" class="tabContent">
         <table class="home">
-            <tr><th>Welcome!</th><td style="font-weight: bold; font-size: 18px;"><?= $this->user->login; ?></td></tr>
-            <tr>
-                <th>Your email:</th>
-                <td>
-                    <input id="userEmail" value="<?= $this->user->email; ?>" name="email" type="text" readonly title="double click to edit" ondblclick="$(this).attr('readonly', false)" onchange="emailChange()" onblur="$(this).attr('readonly', true);" style="width: 300px; border:0; border-bottom: 1px dashed gray; background: trasparent; padding: 2px;">
-                </td>
-            </tr>
+            <tr><th>Welcome!</th><td style="font-weight: bold; font-size: 18px;"><?= $this->user->login; ?>
+            <input class="hidden" placeholder="dblclick to enter your email" id="userEmail" value="<?= $this->user->email; ?>" name="email" type="text" readonly title="double click to edit" ondblclick="$(this).attr('readonly', false)" onchange="emailChange()" onblur="$(this).attr('readonly', true);" style="margin-left: 20px; width: 300px; border:0; padding: 0;">
+            </td></tr>
             <tr>
                 <th style="vertical-align: top">Projects:</th>
                 <td>
-                    <div style="margin-bottom: 10px;">
-                        <button style="margin-right: 10px;" title="Add new project" onclick="addNewProject()">Add new project</button>
-                        <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: inline-block; padding: 5px; background: #ddd; border-radius: 4px; margin-left: 20px;">
-                        Import:
-                        <input placeholder="Project name" name="project" type="text">
-                        <input placeholder="Project password" name="password" type="password">
-                        <button style="margin-right: 10px;" onclick="importProject()">Import project</button>
-                        </div>
-                    </div>
-                    <?php
-                    $projects = array();
-                    foreach($this->user->projects as $userProject) {
-                        $project = $userProject->project;
-                        $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
-                        $projects[] = '<span onclick="selectProject(this);" class="projectName '.$class.'" data-projectId="'.$project->id.'">'.$project->name.'</span>';
-                    }
-                    echo join('', $projects);
-                    ?>
+                    <fieldset>
+                        <legend>
+                            <button title="Add new project" onclick="addNewProject()">+</button>
+                            <input id="new-project-name" type="text" placeholder="project name">
+                            <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: inline-block; padding: 5px;  border-radius: 4px; margin-left: 10px;">
+                                Import:
+                                <input placeholder="Project name" name="project" type="text">
+                                <input placeholder="Project password" name="password" type="password">
+                                <button style="margin-right: 10px;" onclick="importProject()">Import project</button>
+                            </div>
+                        </legend>
+                        <blockquote>
+                        <?php
+                        $projects = array();
+                        foreach($this->user->projects as $userProject) {
+                            $project = $userProject->project;
+                            $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
+                            $projects[] = '<div onclick="selectProject(this);" class="projectName '.$class.'" data-projectId="'.$project->id.'">'.$project->name.'</div>';
+                        }
+                        echo join('', $projects);
+                        ?>
+                        </blockquote>
+                    </fieldset>
                 </td>
             </tr>
 
             <?php if(isset($this->project)): ?>
+            <tr><th style="vertical-align: top;">Contributors:</th>
+                <td style="padding: 0">
+                    <fieldset class="contributors">
+                        <legend>
+                        <button title="Add new contributor" onclick="addNewUser()">+</button>
+                        <input id="new-contributor-name" type="text" placeholder="username">
+                        </legend>
+                        <blockquote>
+                        <?php
+                        $contributors = array();
+                        foreach($this->project->users as $projectUser) {
+                            $user = $projectUser->user;
+                            if($user->email) {
+                                $contributors[] = '<a href="mailto:'.$user->email.'">'.$user->login.'</a>';
+                            } else {
+                                $contributors[] = '<span>'.$user->login.'</span>';
+                            }
+                        }
+                        echo join(', ', $contributors);
+                        ?>
+                        </blockquote>
+                    </fieldset>
+                </td>
+            </tr>
             <tr><th style="vertical-align: top;" >Spints:</th>
                 <td style="padding: 0">
                     <fieldset>
-                        <legend><button title="Add new sprint" onclick="addNewSprint()">+</button></legend>
+                        <legend>
+                            <button title="Add new sprint" onclick="addNewSprint()">+</button>
+                            <input id="new-sprint-name" type="text" placeholder="sprint name">
+                        </legend>
                         <ul id="sprints-list">
                             <?php
                             foreach($this->project->sprints as $sprint) {
@@ -569,6 +618,17 @@ function selectSprint(id) {
     location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
 }
 
+function addNewUser() {
+    $.post(uri('Project','addUserToProject'), {
+        username: $('#new-contributor-name').val()
+    }, function(data, status, Request) {
+        if(data === true) {
+            window.location.href = uri('Board', 'project');
+        } else {
+            alert(data.error);
+        }
+    });
+}
 
 function importProject() {
     $.post(uri('Project','import'), {
@@ -581,7 +641,6 @@ function importProject() {
             alert(data.error);
         }
     });
-
 }
 
 $(function() {

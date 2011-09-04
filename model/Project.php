@@ -17,5 +17,6 @@ class Project extends DbModel
     public function _init() {
         $this->sprints = new Relation('Sprint', array('id_project'=>'id'));
         $this->tasks = new Relation('Task', array('id_project'=>'id'));
+        $this->users = new Relation('UserProject', array('id_project'=>'id'));
     }
 }

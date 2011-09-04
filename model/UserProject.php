@@ -13,9 +13,11 @@ class UserProject extends DbModel
     );
 
     protected $project;
+    protected $user;
 
     public function _init() {
         $this->project = new Relation('Project', array('id' => 'id_project'), true);
+        $this->user = new Relation('User', array('id' => 'id_user'), true);
     }
 
     static public function assignProjectToUser(Project $project, User $user) {

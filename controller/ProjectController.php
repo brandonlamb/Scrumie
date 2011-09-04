@@ -2,6 +2,16 @@
 
 class ProjectController extends AppController 
 {
+    public function addUserToProjectAction() {
+        $user = User::getBy('login', $this->getParam('username'));
+        if(!$user->count()) {
+            throw new AppControllerException('Invalid username');
+        }
+
+        UserProject::assignProjectToUser($this->getCurrentProject(), current($user));
+        $this->result = true;
+    }
+
     public function importAction() {
         $project = Project::getBy(array( 'name' => $this->getParam('project'), 'password' => md5($this->getParam('password'))));
         if(!$project->count()) {

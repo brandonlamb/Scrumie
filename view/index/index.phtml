@@ -4,9 +4,11 @@
     .hidden {display: none;}
     #registryDialog {margin-top: 10px;}
     .loginDialog div.ui-dialog-titlebar {display: none;}
+    h1 {font-size: 18px}
 </style>
 <center>
 <div id="loginDialog" class="dialog">
+    <h1>Scrumie</h1>
     <form id="loginForm" onsubmit="return false;">
     <table>
     <tr><td>Login:</td><td><input class="text" name="login" type="text"/></td></tr>
@@ -15,17 +17,19 @@
     </table>
     <div style="font-size: 11px;">
 
-    <strong>What next</strong>
-    <ul style="margin: 2px">
-        <li>Additional colors for sticky notes</li>
-        <li>Add user stories</li>
-        <li>Public link for project</li>
-    </ul>
-
-    <strong>3.09.2011</strong>
+    <strong>5.09.2011</strong>
     <ul style="margin: 2px">
         <li>Change project login to user login (If you have projects already create new user account then import your projects to it)</li>
     </ul>
+
+    <strong>What next</strong>
+    <ul style="margin: 2px">
+        <li>Additional colors for sticky notes</li>
+        <li>Public link for project</li>
+        <li>Remove old projects</li>
+        <li>Add user stories</li>
+    </ul>
+
     </div>
     <br/><small><a href="https://github.com/nigro/Scrumie">http:://github.com/nigro/Scrumie</a></small>
     </form>
@@ -94,5 +98,6 @@ function showLoginDialog() {
 
 function showRegistryDialog() {
     $( "#registryDialog" ).removeClass('hidden');
+    $("#registryDialog").find('input[name=login]').focus();
 }
 </script>

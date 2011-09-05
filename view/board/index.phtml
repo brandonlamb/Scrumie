@@ -636,7 +636,7 @@ function importProject() {
         password: $('#importProject input[name=password]').val()
     }, function(data, status, Request) {
         if(data === true) {
-            window.location.href = uri('Board', 'project');
+            window.location.href = uri('Board', 'index');
         } else {
             alert(data.error);
         }

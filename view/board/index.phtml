@@ -539,14 +539,10 @@ function addNewSprint() {
 }
 
 function addNewProject() {
-    var name = prompt('Project name');
-
-    if(name == null)
-        return
+    var name = $('#new-project-name').val();
 
     if(name == '') {
         alert('Project name can\'t be empty');
-        addNewProject();
     }
     else {
         $.post(uri('Project', 'addProject'), {'name': name}, function(data, status, Request) {

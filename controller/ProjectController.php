@@ -27,8 +27,8 @@ class ProjectController extends AppController
         $user = $this->getCurrentUser();
         $project = new Project;
         $project->name = $this->getParam('name');
-        $project_id = $project->save();
-        $user->assignProject($project_id);
+        $project->save();
+        $user->assignProject($project->id);
         DAO::query('commit');
         $this->result = true;
     }

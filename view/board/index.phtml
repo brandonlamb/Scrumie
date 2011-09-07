@@ -519,14 +519,10 @@ function editSprint(element) {
 }
 
 function addNewSprint() {
-    var name = prompt('Sprint name');
-
-    if(name == null)
-        return
+    var name = $('#new-sprint-name').val();
 
     if(name == '') {
         alert('Sprint name can\'t be empty');
-        addNewSprint();
     }
     else {
         $.post(uri('Project','addNewSprint'), {'name': name}, function(data, status, Request) {

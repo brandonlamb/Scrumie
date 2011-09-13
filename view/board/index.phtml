@@ -507,7 +507,7 @@ function deleteSprint(element) {
 
 function editSprint(element) {
     var sprintId = $(element).parent().attr('data-sprintId');
-    var name = $(element).parent().children('a');
+    var name = $(element).parent().children('span.href');
     $(name).attr('contenteditable', true);
     $(name).focus();
     $(name).blur(function() {

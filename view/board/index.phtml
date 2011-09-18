@@ -82,8 +82,9 @@ fieldset legend {
                 <td>
                     <fieldset>
                         <legend>
-                            <button title="Add new project" onclick="addNewProject()">+</button>
                             <input id="new-project-name" type="text" placeholder="New project name">
+                            <button title="Add new project" onclick="addNewProject()">+</button>
+                            <button title="Untouch/Delete project.&#13;Project will be deleted when no others contributors are assigned to it, otherwise it will be untouch only from your account" onclick="deleteProject()">-</button>
                             <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: inline-block; padding: 5px;  border-radius: 4px; margin-left: 10px;">
                                 Import:
                                 <input placeholder="Project name" name="project" type="text">
@@ -91,7 +92,7 @@ fieldset legend {
                                 <button style="margin-right: 10px;" onclick="importProject()">Import project</button>
                             </div>
                         </legend>
-                        <blockquote>
+                        <div style="padding: 10px;">
                         <?php
                         $projects = array();
                         foreach($this->user->projects as $userProject) {
@@ -101,18 +102,38 @@ fieldset legend {
                         }
                         echo join('', $projects);
                         ?>
-                        </blockquote>
+                        </div>
                     </fieldset>
                 </td>
             </tr>
 
             <?php if(isset($this->project)): ?>
+            <tr><th style="vertical-align: top;" >Spints:</th>
+                <td style="padding: 0">
+                    <fieldset>
+                        <legend>
+                            <input id="new-sprint-name" type="text" placeholder="sprint name">
+                            <button title="Add new sprint" onclick="addNewSprint()">+</button>
+                        </legend>
+                        <ul id="sprints-list">
+                            <?php
+                            foreach($this->project->sprints as $sprint) {
+                                $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
+                                $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
+                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span class='href' style='padding: 2px; margin-right: 10px;' onclick='selectSprint($sprint->id)'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
+                            }
+                            ?>
+                        </ul>
+                    </fieldset>
+                </td>
+            </tr>
+
             <tr><th style="vertical-align: top;">Contributors:</th>
                 <td style="padding: 0">
                     <fieldset class="contributors">
                         <legend>
-                        <button title="Add new contributor" onclick="addNewUser()">+</button>
                         <input id="new-contributor-name" type="text" placeholder="username">
+                        <button title="Add new contributor" onclick="addNewUser()">+</button>
                         </legend>
                         <blockquote>
                         <?php
@@ -128,25 +149,6 @@ fieldset legend {
                         echo join(', ', $contributors);
                         ?>
                         </blockquote>
-                    </fieldset>
-                </td>
-            </tr>
-            <tr><th style="vertical-align: top;" >Spints:</th>
-                <td style="padding: 0">
-                    <fieldset>
-                        <legend>
-                            <button title="Add new sprint" onclick="addNewSprint()">+</button>
-                            <input id="new-sprint-name" type="text" placeholder="sprint name">
-                        </legend>
-                        <ul id="sprints-list">
-                            <?php
-                            foreach($this->project->sprints as $sprint) {
-                                $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
-                                $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
-                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span class='href' style='padding: 2px; margin-right: 10px;' onclick='selectSprint($sprint->id)'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
-                            }
-                            ?>
-                        </ul>
                     </fieldset>
                 </td>
             </tr>
@@ -635,7 +637,22 @@ function importProject() {
     });
 }
 
-$(function() {
+function deleteProject() {
+    var project = $('.projectName, .selected');
+    if(project.length == 0) {
+        alert('Select project you want to untouch');
+        return;
+    }
+    $.post(uri('Project', 'deleteProject') , {id: $(project).attr('data-projectid')}, function(data, status, Request) {
+        if(data === true) {
+            window.location.href = uri('Board', 'index');
+        } else {
+            alert(data.error);
+        }
+    });
+}
+
+$(document).ready(function() {
     $( "#tabs" ).tabs();
 
     var tabIndex = parseInt($.getUrlVar('tab'));
@@ -651,5 +668,4 @@ $(function() {
 
     updateSummary();
 });
-
 </script>

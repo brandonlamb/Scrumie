@@ -19,4 +19,11 @@ class Project extends DbModel
         $this->tasks = new Relation('Task', array('id_project'=>'id'));
         $this->users = new Relation('UserProject', array('id_project'=>'id'));
     }
+
+    static public function deleteIfNoContributors(Project $project) {
+        $collection = UserProject::getBy('id_project', $project->id);
+        if(count($collection) == 0) {
+            $project->delete();
+        }
+    }
 }

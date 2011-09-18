@@ -104,5 +104,11 @@ class ProjectController extends AppController
         }
     }
 
-
+    public function deleteProjectAction() {
+        $project = $this->getCurrentProject();
+        $user = $this->getCurrentUser();
+        UserProject::untouchProjectFromUser($project, $user);
+        Project::deleteIfNoContributors($project);
+        $this->result = true;
+    }
 }

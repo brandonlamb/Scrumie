@@ -85,7 +85,7 @@ fieldset legend {
                             <input id="new-project-name" type="text" placeholder="New project name">
                             <button title="Add new project" onclick="addNewProject()">+</button>
                             <button title="Untouch/Delete project.&#13;Project will be deleted when no others contributors are assigned to it, otherwise it will be untouch only from your account" onclick="deleteProject()">-</button>
-                            <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: inline-block; padding: 5px;  border-radius: 4px; margin-left: 10px;">
+                            <div id="importProject" title="If you already have some projects in Scrumie, you can import it easly to your account. Just enter project name and its password" style="display: none; padding: 5px;  border-radius: 4px; margin-left: 10px;">
                                 Import:
                                 <input placeholder="Project name" name="project" type="text">
                                 <input placeholder="Project password" name="password" type="password">
@@ -638,7 +638,7 @@ function importProject() {
 }
 
 function deleteProject() {
-    var project = $('.projectName, .selected');
+    var project = $('.projectName.selected');
     if(project.length == 0) {
         alert('Select project you want to untouch');
         return;

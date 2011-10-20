@@ -26,7 +26,7 @@ after that create your own configuration file based on distribution config file
 
 run database migration
 
-    ./cli.php task/LiquibaseUpdate.php
+    ./cli.php task/LiquibaseUpdate.php config=config.ini
 
 If everything goes well you will see communicate: Liquibase Update Successful
 After that you can open web browser with address: http://localhost/Scrumie

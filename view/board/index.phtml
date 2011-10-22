@@ -21,43 +21,7 @@ function prepareTask(Task $task, $draggable = true) {
 
     return sprintf($taskHelper, $task->id, $draggable, $task->body, $task->estimation, $task->done, $task->owner);
 }
-
 ?>
-
-<style>
-.sprint .icon {border: 1px solid #ddf; position: relative; top: 2px; display: inline-block; cursor: pointer;}
-div#tabs ul li {height: 28px;}
-table.home td {border: 0;}
-table.home th {width: 100px; text-align: right;}
-fieldset {
-    margin-bottom: 20px; 
-    border: 0px solid #ddd; 
-    border-top: 1px solid #999; 
-    border-left: 0; 
-    border-bottom: 0; 
-    padding: 0;
-    border-radius: 5px;
-    background-image: -webkit-gradient(
-        linear,
-        left bottom,
-        left top,
-        color-stop(0.20, rgb(252,252,252)),
-        color-stop(0.72, rgb(240,240,240))
-    );
-
-}
-fieldset legend {
-    border-radius: 5px;
-    border: 1px solid lightgray;
-    background: #eee;
-}
-
-.projectName {margin-left: 5px; display: inline-block; padding: 5px; padding-left: 20px; padding-right: 20px; background: #eee; border-radius: 5px; cursor: pointer;}
-.projectName:hover {background: lightgreen}
-.selected {background: lightgreen}
-.href {cursor: pointer;}
-.href:hover {text-decoration: underline;}
-</style>
 
 <div id="tabs">
     <ul>
@@ -69,13 +33,12 @@ fieldset legend {
         <?php if(isset($this->project)): ?>
         <li><a href="#tabs-backlog">Backlog</a></li>
         <?php endif ?>
-        <li><a onclick="location.href = uri('User', 'logout');">Logout</a></li>
+        <li><a onclick="Scrumie.logout()">Logout</a></li>
     </ul>
 
     <div id="tabs-home" class="tabContent">
         <table class="home">
             <tr><th>Welcome!</th><td style="font-weight: bold; font-size: 18px;"><?= $this->user->login; ?>
-            <input class="hidden" placeholder="dblclick to enter your email" id="userEmail" value="<?= $this->user->email; ?>" name="email" type="text" readonly title="double click to edit" ondblclick="$(this).attr('readonly', false)" onchange="emailChange()" onblur="$(this).attr('readonly', true);" style="margin-left: 20px; width: 300px; border:0; padding: 0;">
             </td></tr>
             <tr>
                 <th style="vertical-align: top">Projects:</th>
@@ -98,7 +61,7 @@ fieldset legend {
                         foreach($this->user->projects as $userProject) {
                             $project = $userProject->project;
                             $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
-                            $projects[] = '<div onclick="selectProject(this);" class="projectName '.$class.'" data-projectId="'.$project->id.'">'.$project->name.'</div>';
+                            $projects[] = '<div onclick="Scrumie.Project.select('.$project->id.')" class="projectName '.$class.'">'.$project->name.'</div>';
                         }
                         echo join('', $projects);
                         ?>
@@ -113,14 +76,15 @@ fieldset legend {
                     <fieldset>
                         <legend>
                             <input id="new-sprint-name" type="text" placeholder="sprint name">
-                            <button title="Add new sprint" onclick="addNewSprint()">+</button>
+                            <button title="Add new sprint" onclick="Scrumie.Sprint.add($(this).parent().find('input').val())">+</button>
                         </legend>
                         <ul id="sprints-list">
                             <?php
                             foreach($this->project->sprints as $sprint) {
-                                $edit = '<span onclick="editSprint(this)" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
-                                $delete = '<span onclick="deleteSprint(this)" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
-                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span class='href' style='padding: 2px; margin-right: 10px;' onclick='selectSprint($sprint->id)'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
+                                $edit = '<span onclick="Scrumie.Sprint.edit('.$sprint->id.')" class="ui-icon ui-icon-pencil round4 icon" title="Edit sprint name" ></span>';
+                                $delete = '<span onclick="Scrumie.Sprint.del('.$sprint->id.')" class="ui-icon ui-icon-trash round4 icon" title="Delete" ></span>';
+
+                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span onclick='Scrumie.Sprint.select({$sprint->id});' class='href' style='padding: 2px; margin-right: 10px;'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
                             }
                             ?>
                         </ul>
@@ -159,7 +123,14 @@ fieldset legend {
     <?php if(isset($this->sprint)): ?>
     <div id="tabs-board" class="tabContent">
         <div class="helpers">
-            <button onclick="addNewTask();">+ Add new task</button>
+            <button onclick="Scrumie.Task.add($(this).find('div.task'), 'td#todo'); setEditable(); setDraggable(); ">+ Add new task
+                <div id="" data-sprintId="<?= (isset($this->sprint)) ? $this->sprint->id : '';?>" class="task round4 draggable hidden">
+                    <div class="editable body">Double click to edit...</div>
+                    <span title="Estimation" class="estimation">1</span>
+                    <span class="done">0</span>
+                    <span class="owner" title="Owner" style="float: right;"></span>
+                </div>
+            </button>
         </div>
         <table id="board" class="round4">
             <tr>
@@ -334,7 +305,7 @@ function setSortable() {
                 order[index] = $(element).attr('id');
             });
 
-            $.post(uri('Project','reorderTask'), {'order': order}, function(data, status, Request) {
+            $.post(Scrumie.uri('Project','reorderTask'), {'order': order}, function(data, status, Request) {
             });
         }
     });
@@ -403,7 +374,7 @@ function setEditable() {
                 if (! confirm('Are you sure you want to delete this task') )
                     return;
 
-                $.post(uri('Project','deleteTask'), {taskId: $(t).attr('id')}, function(data, status, Request) {
+                $.post(Scrumie.uri('Project','deleteTask'), {taskId: $(t).attr('id')}, function(data, status, Request) {
                         if(data)
                             $(t).remove();
                 });
@@ -456,7 +427,7 @@ function saveTask(task) {
         state: $(task).parent().attr('id')
     };
 
-    $.post(uri('Project', 'saveTask'), params, function(data, status, Request) {
+    $.post(Scrumie.uri('Project', 'saveTask'), params, function(data, status, Request) {
         if(data)
             $(task).attr('id', data)
         else
@@ -464,13 +435,6 @@ function saveTask(task) {
     });
 
     updateSummary();
-}
-
-function addNewTask() {
-    var taskHtml = '<div id="" data-sprintId="<?= (isset($this->sprint)) ? $this->sprint->id : '';?>" class="task round4 draggable"><div class="editable body">Double click to edit...</div><span title="Estimation" class="estimation">1</span>&nbsp;<span class="done">0</span>&nbsp;<span class="owner" title="Owner" style="float: right;"></span></div>';
-    var task = $(taskHtml).appendTo('td#todo');
-    setEditable();
-    setDraggable();
 }
 
 function addNewBacklogTask() {
@@ -488,54 +452,6 @@ function addNewBacklogTask() {
     setEditable();
 }
 
-function emailChange() {
-    var email = $('input#userEmail').val();
-    $.post(uri('User', 'changeEmail'), {email: email}, function(data) {
-    });
-}
-
-function deleteSprint(element) {
-    var sprintId = $(element).parent().attr('data-sprintId');
-    var name = $(element).parent().children('a').html();
-    if (!confirm('Are you sure you want to delete "' + name + '"?\n\nAll information connected with this sprint will be permamently removed!'))
-        return;
-
-    $.post(uri('Project', 'deleteSprint'), {id: sprintId}, function(data) {
-        if(data == true) {
-            $(element).parent().remove();
-        }
-    })
-}
-
-function editSprint(element) {
-    var sprintId = $(element).parent().attr('data-sprintId');
-    var name = $(element).parent().children('span.href');
-    $(name).attr('contenteditable', true);
-    $(name).focus();
-    $(name).blur(function() {
-        $(this).attr('contenteditable', false);
-        $(this).css('border', '0');
-        $.post(uri('Project', 'renameSprint'), {id: sprintId, name: $(this).html()});
-        $(this).unbind('blur');
-    });
-}
-
-function addNewSprint() {
-    var name = $('#new-sprint-name').val();
-
-    if(name == '') {
-        alert('Sprint name can\'t be empty');
-    }
-    else {
-        $.post(uri('Project','addNewSprint'), {'name': name}, function(data, status, Request) {
-            if(data === true)
-                window.location.reload();
-            else
-                alert(data.error);
-        });
-    }
-}
-
 function addNewProject() {
     var name = $('#new-project-name').val();
 
@@ -543,7 +459,7 @@ function addNewProject() {
         alert('Project name can\'t be empty');
     }
     else {
-        $.post(uri('Project', 'addProject'), {'name': name}, function(data, status, Request) {
+        $.post(Scrumie.uri('Project', 'addProject'), {'name': name}, function(data, status, Request) {
             if(data === true) {
                 window.location.reload();
             } else {
@@ -603,34 +519,12 @@ function updateSummary() {
     $('span#done-sum-done').html(summary['done'].done);
 }
 
-function selectProject(el) {
-    var projectId = $(el).attr('data-projectId');
-    location.href = uri('Board', 'project') + '&id=' + projectId;
-}
-
-function selectSprint(id) {
-    location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
-}
-
 function addNewUser() {
-    $.post(uri('Project','addUserToProject'), {
+    $.post(Scrumie.uri('Project','addUserToProject'), {
         username: $('#new-contributor-name').val()
     }, function(data, status, Request) {
         if(data === true) {
-            window.location.href = uri('Board', 'project');
-        } else {
-            alert(data.error);
-        }
-    });
-}
-
-function importProject() {
-    $.post(uri('Project','import'), {
-        project: $('#importProject input[name=project]').val(), 
-        password: $('#importProject input[name=password]').val()
-    }, function(data, status, Request) {
-        if(data === true) {
-            window.location.href = uri('Board', 'index');
+            window.location.href = Scrumie.uri('Board', 'project');
         } else {
             alert(data.error);
         }
@@ -643,29 +537,29 @@ function deleteProject() {
         alert('Select project you want to untouch');
         return;
     }
-    $.post(uri('Project', 'deleteProject') , {id: $(project).attr('data-projectid')}, function(data, status, Request) {
+    $.post(Scrumie.uri('Project', 'deleteProject') , {id: $(project).attr('data-projectid')}, function(data, status, Request) {
         if(data === true) {
-            window.location.href = uri('Board', 'index');
+            window.location.href = Scrumie.uri('Board', 'index');
         } else {
             alert(data.error);
         }
     });
 }
 
+function getAsNumber(value) {
+        if(isNaN(value))
+            return 0;
+
+        if(value == '')
+            return 0;
+
+        return parseFloat(value);
+}
+
 $(document).ready(function() {
-    $( "#tabs" ).tabs();
-
-    var tabIndex = parseInt($.getUrlVar('tab'));
-    if(tabIndex)
-        $( "#tabs" ).tabs({ selected: parseInt(tabIndex) });
-    else if($.getUrlVar('sprint')) 
-        $( "#tabs" ).tabs({ selected: 1 });
-
     setDraggable();
     setEditable();
     setSortable();
-    $("table#board").css('height', ($(window).height() - 120));
-
     updateSummary();
 });
 </script>

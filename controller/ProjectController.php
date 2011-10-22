@@ -12,16 +12,6 @@ class ProjectController extends AppController
         $this->result = true;
     }
 
-    public function importAction() {
-        $project = Project::getBy(array( 'name' => $this->getParam('project'), 'password' => md5($this->getParam('password'))));
-        if(!$project->count()) {
-            throw new AppControllerException('Invalid project name or password');
-        } 
-        UserProject::assignProjectToUser(current($project), $this->getCurrentUser());
-        $this->result = true;
-
-    }
-
     public function addProjectAction() {
         DAO::query('begin');
         $user = $this->getCurrentUser();

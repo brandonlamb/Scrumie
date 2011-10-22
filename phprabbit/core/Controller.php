@@ -1,5 +1,9 @@
 <?php
 
+require_once('View.php');
+require_once('Request.php');
+require_once('FrontController.php');
+
 abstract class Controller {
     public $view;
     public $layout;
@@ -47,14 +51,14 @@ abstract class Controller {
         }
     }
 
-    public function forward($controller, $action) {
+    public function forward($controller, $action = 'index') {
         $fronController = FrontController::getInstance();
         $fronController->Routing->controller = $controller;
         $fronController->Routing->action = $action;
         $fronController->dispatch();
     }
 
-    public function redirect($controller, $action) {
+    public function redirect($controller, $action = 'index') {
         //todo ajax redirect
         $fronController = FrontController::getInstance();
         $fronController->Routing->controller = $controller;
@@ -71,5 +75,5 @@ abstract class Controller {
     public function setContext($type) {
         $this->context = $type;
     }
-
 }
+class ControllerException extends Exception {}

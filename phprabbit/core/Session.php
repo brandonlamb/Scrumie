@@ -2,15 +2,18 @@
 
 class SessionException extends Exception {}
 class Session {
-    public $data;
+    public $data = array();
     protected function __construct() {
-        $this->data = &$_SESSION;
+        if(isset($_SESSION)) {
+            $this->data = &$_SESSION;
+        } 
     }
 
     static public function getInstance() {
         static $instance = null;
         if (!$instance)
             $instance = new self;
+
         return $instance;
     }
 

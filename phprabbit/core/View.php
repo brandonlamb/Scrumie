@@ -8,6 +8,10 @@ class View {
     final function __construct() {
     }
 
+    public function __get($name) {
+        return null;
+    }
+
     public function __toString() {
         try {
             return $this->render();

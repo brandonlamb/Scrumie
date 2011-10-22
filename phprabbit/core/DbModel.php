@@ -21,16 +21,10 @@ abstract class DbModel extends DataModel
     }
 
     public function save() {
-        if($this->getId() === null) {
-            if(! $id = DAO::insert($this))
-                return false;
-
-            $id = $this->setId($id);
-            return $id;
-        }
-        else {
+        if($this->getId() === null)
+            $this->setId(DAO::insert($this));
+        else 
             return DAO::update($this);
-        }
     }
 
     public function delete() {

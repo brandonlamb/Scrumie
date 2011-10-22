@@ -44,4 +44,8 @@ class Request {
 
         return $default;
     }
+
+    public function setParams(array $params) {
+        $this->get = $params;
+    }
 }

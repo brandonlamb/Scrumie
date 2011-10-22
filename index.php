@@ -5,9 +5,6 @@
  * http://scrumie.cjb.net
  */
 require_once('bootstrap.php');
-require_once (PHP_RABBIT_PATH . 'core/BaseRouting.php');
-
 session_start();
-
-Application::getInstance('config.ini');
-FrontController::getInstance()->setRouting('BaseRouting')->dispatch();
+$application = new Application('config.ini');
+$application->getFrontController()->setRouting('BaseRouting')->dispatch();

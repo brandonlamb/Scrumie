@@ -1,6 +1,6 @@
 <?php
 
-require_once(PHP_RABBIT_PATH.'core/Api.php');
+require_once(PHP_RABBIT_PATH.'core/Controller.php');
 class AppControllerException extends Exception {}
 class AppController extends Controller
 {

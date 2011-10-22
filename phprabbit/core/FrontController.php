@@ -19,6 +19,7 @@ class FrontController {
     }
 
     public function setRouting($routingName) {
+        require_once($routingName.'.php');
         $routing = new $routingName;
         if(! $routing instanceof RoutingInterface)
             throw new InvalidArgumentException(sprintf('Class %s must implements RoutingInterface', get_class($routing)));

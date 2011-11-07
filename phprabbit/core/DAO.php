@@ -1,5 +1,4 @@
 <?php
-
 require_once('DatabaseAdapter.php');
 require_once('Collection.php');
 require_once('DbModel.php');
@@ -72,8 +71,8 @@ class DAO {
     public function count(array $columns) {
 
         $where = array();
-        foreach($columns as $key => $values)
-            $where[] = '"'.$key.'" = '.self::prepareValueForSql($values);
+        foreach($columns as $key => $value)
+            $where[] = sprintf('"%s" %s', $key, self::prepareValueForSql($value));
 
         $sql = sprintf('SELECT count(*) as cnt FROM "%s" WHERE %s', $this->tableName, join(' AND ', $where));
 
@@ -87,8 +86,8 @@ class DAO {
     public function fetchBy(array $columns, array $order = array(), $limit = null) {
 
         $where = array();
-        foreach($columns as $key => $values)
-            $where[] = "\"$key\" = '$values'";
+        foreach($columns as $key => $value)
+            $where[] = sprintf('"%s" %s', $key, self::prepareValueForSql($value));
 
         $sql = sprintf('SELECT * FROM "%s" WHERE %s', $this->tableName, join(' AND ', $where));
 
@@ -124,7 +123,7 @@ class DAO {
         $values = array();
         foreach($data as $column => $value) {
             $columns[] = '"'.$column.'"';
-            $values[] = self::prepareValueForSql($value);
+            $values[] = self::prepareValueForSql($value, false);
         }
 
         $sql = sprintf('INSERT INTO "%s" (%s) VALUES (%s)', $adapter->tableName, join(',',$columns), join(',', $values));
@@ -140,9 +139,10 @@ class DAO {
 
         $values = array();
         foreach($data as $column => $value)
-            $values[] = '"'.$column.'" = '.self::prepareValueForSql($value);
+            $values[] = sprintf('"%s" = %s', $column, self::prepareValueForSql($value, false));
 
         $sql = sprintf('UPDATE "%s" SET %s WHERE %s = %s', $adapter->tableName, join(',',$values), $adapter->indexName, $model->getId());
+
         $result = self::query($sql);
         return true;
     }
@@ -162,13 +162,16 @@ class DAO {
         self::query($sql);
     }
 
-    static public function prepareValueForSql($value) {
+    static public function prepareValueForSql($value, $withOperator = true) {
+        $operator = '=';
         if(is_string($value))
             $result = $value ? "'$value'" : 'NULL';
         elseif(is_numeric($value))
             $result = $value === null ? 'NULL' : $value;
-        elseif($value === null)
+        elseif($value === null) {
+            $operator = 'IS';
             $result = 'NULL';
+        }
         elseif(is_object($value)) {
             $result = "'".((string) $value)."'";
         }
@@ -178,6 +181,6 @@ class DAO {
         else 
             $result = $value;
 
-        return $result;
+        return ($withOperator) ? "$operator $result" : $result;
     }
 }

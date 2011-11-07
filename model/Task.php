@@ -7,16 +7,14 @@ class Task extends DbModel
 
     const STATE_TODO = 'todo';
     const STATE_INPROGRESS = 'inProgress';
-    const STATE_COMMITED = 'commited';
-    const STATE_READYFORTEST = 'readyForTest';
+    const STATE_TOVERIFY = 'toVerify';
     const STATE_DONE = 'done';
     const STATE_DETACHED = 'detached';
 
     static public $availablesStates = array(
         self::STATE_TODO,
         self::STATE_INPROGRESS,
-        self::STATE_COMMITED,
-        self::STATE_READYFORTEST,
+        self::STATE_TOVERIFY,
         self::STATE_DONE,
         self::STATE_DETACHED
     );
@@ -29,8 +27,9 @@ class Task extends DbModel
         'owner' => null,
         'state' => null,
         'done' => null,
-        'order' => null,
         'id_project' => null,
+        'color' => null,
+        'id_story' => null,
     );
 
     protected $history;
@@ -55,12 +54,8 @@ class Task extends DbModel
         return ($this->state == self::STATE_INPROGRESS) ? true : false;
     }
 
-    public function isCommited() {
-        return ($this->state == self::STATE_COMMITED) ? true : false;
-    }
-
-    public function isReadyForTest() {
-        return ($this->state == self::STATE_READYFORTEST) ? true : false;
+    public function isToVerify() {
+        return ($this->state == self::STATE_TOVERIFY) ? true : false;
     }
 
     public function isDone() {

@@ -19,19 +19,10 @@ class TaskCollection extends Collection {
         return $collection;
     }
 
-    public function getCommited() {
+    public function getToVerify() {
         $collection = array();
         foreach($this as $task) {
-            if($task->isCommited())
-                $collection[] = $task;
-        }
-        return $collection;
-    }
-
-    public function getReadyForTest() {
-        $collection = array();
-        foreach($this as $task) {
-            if($task->isReadyForTest())
+            if($task->isToVerify())
                 $collection[] = $task;
         }
         return $collection;

@@ -1,5 +1,5 @@
 /**
- * Scrumie scope
+ * Scrumie API
  */
 (function($) {
     var generateId = function () {
@@ -33,9 +33,54 @@
                 location.href = uri('Board', 'project') + '&id=' + id;
             };
 
+            var del = function(el) {
+                if(el.length == 0) {
+                    alert('Select project you want to untouch');
+                    return;
+                }
+                
+                $.post(uri('Project', 'deleteProject') , {id: $(el).attr('data-projectId')}, function(data, status, Request) {
+                    if(data === true) {
+                        location.href = uri('Board', 'index');
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            };
+
+            var add = function(name) {
+                if(name == '') {
+                    alert('Project name can\'t be empty');
+                    return;
+                }
+
+                $.post(uri('Project', 'addProject'), {'name': name}, function(data, status, Request) {
+                    if(data === true) {
+                        location.reload();
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            };
+
+            var addUser = function(name) {
+                $.post(uri('Project','addUserToProject'), {
+                    username: name
+                }, function(data, status, Request) {
+                    if(data === true) {
+                        location.href = uri('Board', 'project');
+                    } else {
+                        alert(data.error);
+                    }
+                });
+            };
+
             return {
-                select: select
-            }
+                select: select,
+                add: add,
+                del: del,
+                addUser: addUser
+            };
         }();
 
         var Sprint = function() {
@@ -77,8 +122,13 @@
             };
 
             var select = function(id) {
-                location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
+                var el = ($('#sprints-list').find('li[data-sprintId='+id+']').find('span.href'));
+                
+                if (el.attr('contenteditable') === 'false') {
+                    location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
+                }
             };
+
 
             return {
                 add: add,
@@ -88,16 +138,197 @@
             };
         }();
 
-        var Task = function() {
-            var add = function(el, placeholder) {
-                var task = $(el).clone();
-                task.appendTo('td#todo');
-                task.removeClass('hidden');
+        var Story = function() {
+            var add = function(newstory) {
+
+                $.post(uri('Project', 'addNewUserStory'), function(data) {
+                    if(data) {
+                        newstory.attr('data-storyid', data);
+                        newstory.appendTo('div#story-container'); 
+                        droppable();
+                    }
+                })
+            };
+
+            var del = function(story) {
+                var confirm = $(story).find('.user_story.confirm_delete').addClass('show');
+
+                var yes = $(confirm).find('button.yes');
+                var cancel = $(confirm).find('button.cancel');
+
+                yes.unbind('click');
+                cancel.unbind('click');
+
+                yes.click(function() {
+                    var id = $(story).attr('data-storyid');
+                    $.post(uri('Project','deleteUserStory'), {id: id}, function(response) {
+                        if(response === true)
+                            $(story).remove();
+                        else
+                            alert(response.error);
+                    });
+                })
+
+                cancel.click(function() {
+                    confirm.removeClass('show');
+                });
+            };
+
+            var edit = function(story) {
+                $(story).find('span.name').attr('contenteditable', true);
+                $(story).find('span.name').focus();
+                $(story).find('span.name').blur(function() {
+                    $(this).attr('contenteditable', false);
+                    $(this).css('border', '0');
+                    $.post(uri('Project', 'renameUserStory'), {id: $(story).attr('data-storyid'), name: $(this).html()});
+                    $(this).unbind('blur');
+                });
+            };
+
+            var detach = function(story) {
+                console.log(story);
+                var id = $(story).attr('data-storyid');
+                $.post(uri('Project','detachUserStory'), {id: id}, function(response) {
+                    if(response === true)
+                        $(story).remove();
+                    else
+                        alert(response.error);
+                });
             };
 
             return {
-                add: add
+                add: add,
+                del: del,
+                edit: edit,
+                detach: detach
             };
+        }();
+
+        var Task = function() {
+            var add = function(el, placeholder) {
+                var task = $(el).clone();
+                task.appendTo(placeholder);
+                task.draggable({
+                    stop: function(event, ui) {
+                        $(this).css('top', 0);
+                        $(this).css('left', 0);
+                        save(this);
+                    }
+                });
+            };
+
+            var edit = function(el) {
+                var task = $(el);
+                task.parent().draggable('option', 'disable', true);
+                task.fadeTo('fast', 0.5, function() {
+                    task.addClass('editable');
+                    task.draggable('option', 'disabled', true);
+                    task.find('button, input').removeClass('noneditable');
+                    task.find('div.body').attr('contenteditable', true);
+                    task.find('div.body').focus();
+                    task.find('div.body').unbind('blur');
+                    task.find('div.body').unbind('focus');
+                    task.find('button.color').click(function() {
+                        task.find('div.body').css('background-color', $(this).attr('data-color'));
+                    });
+                    task.fadeTo('slow', 1.0, function() {
+                        task.click(function(event) {
+                            event.stopPropagation();
+                        });
+                        $(document).click(function() {
+                            task.removeClass('editable');
+                            task.find('div.body').attr('contenteditable', true);
+                            task.draggable('option', 'disabled', false);
+                            task.find('button, input').addClass('noneditable');
+                            task.find('.confirm_delete button').removeClass('noneditable');
+                            task.find('button.color').unbind('click');
+                            save(task); 
+                            $(document).unbind('click');
+                        });
+                    });
+                });
+            };
+
+            var save = function(element) {
+                var task = $(element);
+                var params = {
+                    taskId: task.attr('id'),
+                    state: task.parent().attr('data-state'),
+                    storyId: task.parent().parent().parent().parent().attr('data-storyid'),
+                    body: task.find('div.body').html(),
+                    color: task.find('div.body').css('background-color'),
+                    owner: task.find('select.owner').val(),
+                    estimation: task.find('input.estimation').val(),
+                    done: task.find('input.done').val()
+                };
+
+                $.post(uri('Project', 'saveTask'), params, function(response) {
+                    if(response)
+                        task.attr('id', response)
+                    else
+                        alert('Problem with saving data');
+                });
+            };
+
+            var del = function(element) {
+                var task = $(element);
+                var confirm = $(task).find('.confirm_delete').addClass('show');
+
+                var yes = $(confirm).find('button.yes');
+                var cancel = $(confirm).find('button.cancel');
+
+                yes.unbind('click');
+                cancel.unbind('click');
+
+                yes.click(function() {
+                    $.post(uri('Project', 'deleteTask'), {id: task.attr('id')}, function(response) {
+                        if(response === true) {
+                            task.remove();
+                        } else {
+                            alert(respone.error);
+                        }
+                    });
+                })
+
+                cancel.click(function() {
+                    confirm.removeClass('show');
+                });
+            };
+
+            var changeProgress = function(event, el) {
+                if(event.keyCode == 38) {
+                    $(el).val(parseInt($(el).val()) + 1);
+                    $(el).change();
+                } else if (event.keyCode==40) {
+                    $(el).val(parseInt($(el).val()) - 1);
+                    $(el).change();
+                }
+            };
+
+            return {
+                add: add,
+                edit: edit,
+                save: save,
+                del: del,
+                changeProgress: changeProgress
+            };
+        }();
+
+        var Backlog = function() {
+            var Story = function() {
+                var add = function(newstory) {
+                    newstory.appendTo('#detached'); 
+                    droppable();
+                };
+
+                return {
+                    add: add
+                }
+            }();
+
+            return {
+                Story: Story
+            }
         }();
 
         var logout = function() {
@@ -108,12 +339,42 @@
             location.href = uri('User', 'logout');
         };
 
+        var droppable = function() {
+            $(".droppable").droppable({
+                drop: function(event,ui) {
+                    ui.helper.appendTo(this);
+                    $(this).removeClass('over');
+                },
+                over: function(event, ui) {
+                    $(this).addClass('over');
+                },
+                out: function(event, ui) {
+                    $(this).removeClass('over');
+                }
+            });
+        };
+
+        var draggable = function() {
+            $(".draggable").draggable({
+                stop: function(event, ui) {
+                    $(this).css('top', 0);
+                    $(this).css('left', 0);
+                    Scrumie.Task.save(this);
+                }
+            });
+        };
+
+
         return {
             Project: Project,
             Sprint: Sprint,
+            Story: Story,
+            Backlog: Backlog,
             Task: Task,
             login: login,
             logout: logout,
+            droppable: droppable,
+            draggable: draggable,
             uri: uri
         };
     }();
@@ -133,8 +394,6 @@
         else if($.getUrlVar('sprint')) {
             $( "#tabs" ).tabs({ selected: 1 });
         }
-
-        $("table#board").css('height', ($(window).height() - 120));
 
         setInterval("$.get('?controller=Index&action=keepAlive')", 100000); 
 
@@ -180,11 +439,19 @@
             resizable: false,
             dialogClass: 'loginDialog',
         });
+
+        Scrumie.droppable();
+        Scrumie.draggable();
+
     });
 
     window.Scrumie = Scrumie;
 })(jQuery);
 
+
+/**
+ * Extends jQuery for getUrlVars method
+ */
 $.extend({
   getUrlVars: function(){
     var vars = [], hash;

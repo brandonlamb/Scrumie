@@ -26,6 +26,14 @@ class Sprint extends DbModel
         return $this->tasks;
     }
 
+    public function getStories() {
+        return Story::getBy('id_sprint', $this->id);
+    }
+
+    public function getProject() {
+        return Project::getById($this->id_project);
+    }
+
     public function getSprintEstimation() {
         return $this->getTasks()->getEstimationSum();
     }
@@ -58,5 +66,13 @@ class Sprint extends DbModel
         }
 
         return $dateEstimation;
+    }
+
+    public function save() {
+        parent::save();
+        foreach($this->getStories() as $story) {
+            $story->id_sprint = $this->id;
+            $story->save();
+        }
     }
 }

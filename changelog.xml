@@ -155,7 +155,7 @@
             </column>
             <column name="id_user" type="int">
                 <constraints nullable="false"/>
-            </column>
+           </column>
             <column name="id_project" type="int">
                 <constraints nullable="false"/>
             </column>
@@ -166,5 +166,71 @@
     <changeSet id="11" author="nigro">
         <dropNotNullConstraint tableName="project" columnName="password"/>
     </changeSet>
-    
+
+    <changeSet id="12" author="nigro">
+        <addColumn tableName="task">
+            <column name="color" type="varchar(24)"/>
+        </addColumn>
+        <addNotNullConstraint tableName="task" columnName="color" defaultNullValue="#fffecb" />
+    </changeSet>
+
+    <changeSet id="13" author="nigro">
+        <createTable tableName="story">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" nullable="false"/>
+            </column>
+            <column name="id_sprint" type="int">
+                <constraints nullable="false"/>
+           </column>
+            <column name="name" type="varchar(64)">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_story_id_sprint"
+            baseTableName="story" baseColumnNames="id_sprint"
+            referencedTableName="sprint" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+        <addColumn tableName="task">
+            <column name="id_story" type="int"/>
+        </addColumn>
+        <addForeignKeyConstraint constraintName="fk_task_id_story"
+            baseTableName="task" baseColumnNames="id_story"
+            referencedTableName="story" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="14" author="nigro">
+        <addForeignKeyConstraint constraintName="fk_user_project_id_project"
+            baseTableName="user_project" baseColumnNames="id_project"
+            referencedTableName="project" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+        <addForeignKeyConstraint constraintName="fk_user_project_id_user"
+            baseTableName="user_project" baseColumnNames="id_user"
+            referencedTableName="user" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
+    <changeSet id="15" author="nigro">
+        <dropColumn tableName="task" columnName='"order"'/>
+    </changeSet>
+
+    <changeSet id="16" author="nigro">
+        <dropNotNullConstraint tableName="story" columnName="id_sprint"/>
+    </changeSet>
+
+    <changeSet id="17" author="nigro">
+        <addColumn tableName="story">
+            <column name="id_project" type="int"/>
+        </addColumn>
+        <addForeignKeyConstraint constraintName="fk_story_id_project"
+            baseTableName="story" baseColumnNames="id_project"
+            referencedTableName="project" referencedColumnNames="id"
+            onDelete="CASCADE" onUpdate="CASCADE"
+        />
+    </changeSet>
+
 </databaseChangeLog>

@@ -26,4 +26,8 @@ class Project extends DbModel
             $project->delete();
         }
     }
+
+    public function getDetachedStories() {
+        return Story::getBy(array('id_project'=>$this->id, 'id_sprint'=>null));
+    }
 }

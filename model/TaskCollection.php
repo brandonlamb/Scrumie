@@ -2,7 +2,7 @@
 
 class TaskCollection extends Collection {
     public function getTodo() {
-        $collection = array();
+        $collection = new self;
         foreach($this as $task) {
             if($task->isTodo())
                 $collection[] = $task;
@@ -11,7 +11,7 @@ class TaskCollection extends Collection {
     }
 
     public function getInProgress() {
-        $collection = array();
+        $collection = new self;
         foreach($this as $task) {
             if($task->isInProgress())
                 $collection[] = $task;
@@ -20,7 +20,7 @@ class TaskCollection extends Collection {
     }
 
     public function getToVerify() {
-        $collection = array();
+        $collection = new self;
         foreach($this as $task) {
             if($task->isToVerify())
                 $collection[] = $task;
@@ -29,7 +29,7 @@ class TaskCollection extends Collection {
     }
 
     public function getDone() {
-        $collection = array();
+        $collection = new self;
         foreach($this as $task) {
             if($task->isDone())
                 $collection[] = $task;
@@ -38,7 +38,7 @@ class TaskCollection extends Collection {
     }
 
     public function getDetached() {
-        $collection = array();
+        $collection = new self;
         foreach($this as $task) {
             if($task->isDetached())
                 $collection[] = $task;
@@ -50,6 +50,14 @@ class TaskCollection extends Collection {
         $sum = 0;
         foreach($this as $task) {
             $sum += $task->estimation;
+        }
+        return $sum;
+    }
+
+    public function getDoneSum() {
+        $sum = 0;
+        foreach($this as $task) {
+            $sum += $task->done;
         }
         return $sum;
     }

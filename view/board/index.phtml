@@ -22,8 +22,9 @@ function prepareTask(Task $task, $project) {
         <div id="%s" class="task draggable">
             <div class="body" style="background-color: %s" ondblclick="Scrumie.Task.edit($(this).parent())" >%s</div>
             <div class="status">
-                <input title="Estimation" onchange="Scrumie.Task.save($(this).parent().parent())" onkeyup="Scrumie.Task.changeProgress(event, this)" class="estimation noneditable" value="%s"/>
-                <input onchange="Scrumie.Task.save($(this).parent().parent())" onkeyup="Scrumie.Task.changeProgress(event, this)" title="Done" class="done noneditable" value="%s"/>
+                <input onchange="Scrumie.Task.save($(this).parent().parent()); Scrumie.Story.recalculate($(this).parent().parent().parent().parent());" onkeyup="Scrumie.Task.changeProgress(event, this)" title="Done" class="done noneditable" value="%s"/>
+                /
+                <input title="Estimation" onchange="Scrumie.Task.save($(this).parent().parent()); Scrumie.Story.recalculate($(this).parent().parent().parent().parent());" onkeyup="Scrumie.Task.changeProgress(event, this)" class="estimation noneditable" value="%s"/>
                 <select title="Owner" onchange="Scrumie.Task.save($(this).parent().parent())" name="owner" class="owner">%s</select>
                 <img class="delete_task" onclick="Scrumie.Task.del($(this).parent().parent())" src="http://cdn1.iconfinder.com/data/icons/uidesignicons/delete.png" title="Delete task" />
                 <span class="confirm_delete"> <em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button> </span>
@@ -32,7 +33,7 @@ function prepareTask(Task $task, $project) {
             </div>
         </div>';
 
-    return sprintf($taskHelper, $task->id, $task->color, $task->body, $task->estimation, $task->done, join('', $owner));
+    return sprintf($taskHelper, $task->id, $task->color, $task->body, $task->done, $task->estimation, join('', $owner));
 }
 
 
@@ -43,16 +44,22 @@ function prepareUserStory($story, $project) {
             <tr class="title">
                 <td colspan="4">
                     <img class="move_to_backlog" onclick="Scrumie.Story.detach($(this).parent().parent().parent().parent())" title="'.( ($story->id_sprint) ? 'Move to backlog' : 'Move to sprint').'" src="http://cdn3.iconfinder.com/data/icons/woothemesiconset/16/arrow_left.png"/>
-                    <img class="add_new_task" onclick="Scrumie.Task.add($(\'#newtask\').find(\'div.task\'), $(this).parent().parent().next(\'tr\').find(\'td.todo\'))" src="http://cdn2.iconfinder.com/data/icons/basicset/plus_16.png">
+                    <img class="add_new_task" onclick="Scrumie.Task.add($(\'#newtask\').find(\'div.task\'), $(this).parent().parent().parent().find(\'tr.board\').find(\'td.todo\'))" src="http://cdn2.iconfinder.com/data/icons/basicset/plus_16.png">
                     <img title="Delete user story" class="delete_user_story" onclick="Scrumie.Story.del($(this).parent().parent().parent().parent())" src="http://cdn2.iconfinder.com/data/icons/oxygen/16x16/actions/mail-delete.png"/>
                     <span class="user_story confirm_delete"> <em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button> </span>
                     <span class="name" ondblclick="Scrumie.Story.edit($(this).parent().parent().parent().parent())">%s</span>
                 </td>
             </tr>
-            <tr>
+            <tr class="points">
+                <td>'.$story->getTasks()->getTodo()->getDoneSum().'/'.($todoSum = $story->getTasks()->getTodo()->getEstimationSum()).'</th>
+                <td>'.$story->getTasks()->getInProgress()->getDoneSum().'/'.($inProgressSum = $todoSum + $story->getTasks()->getInProgress()->getEstimationSum()).'</th>
+                <td>'.$story->getTasks()->getToVerify()->getDoneSum().'/'.($toVerifySum = $inProgressSum + $story->getTasks()->getToVerify()->getEstimationSum()).'</th>
+                <td>'.$story->getTasks()->getDone()->getDoneSum().'/'.($toVerifySum + $story->getTasks()->getDone()->getEstimationSum()).'</th>
+            </tr>
+            <tr class="board">
                 <td data-state="todo" class="todo droppable">%s</td>
                 <td data-state="inProgress" class="inProgress droppable">%s</td>
-                <td data-state="toVerify" class="readyForTest droppable">%s</td>
+                <td data-state="toVerify" class="toVerify droppable">%s</td>
                 <td data-state="done" class="done droppable">%s</td>
             </tr>
             <tr><td colspan="4" style="height: 10px; border: 0;"></td></tr>
@@ -209,10 +216,10 @@ function prepareUserStory($story, $project) {
         <div id="story-container">
             <table class="user_story header">
             <tr>
-                <th>TODO</th>
-                <th>IN PROGRESS</th>
-                <th>TO VERIFY</th>
-                <th>DONE</th>
+                <th>TODO<span class="summary"><em></em>/<em></em></span></th>
+                <th>IN PROGRESS<span class="summary"><em></em>/<em></em></span></th>
+                <th>TO VERIFY<span class="summary"><em></em>/<em></em></span></th>
+                <th>DONE<span class="summary"><em></em>/<em></em></span></th>
             </tr>
             </table>
             <?php foreach($this->sprint->getStories() as $story): ?>
@@ -268,48 +275,3 @@ function prepareUserStory($story, $project) {
     <?php endif ?>
 
 </div>
-
-<script>
-
-function updateSummary() {
-    var summary = [];
-    summary['todo'] = {all: 0, done: 0};
-    summary['inProgress'] = {all: 0, done: 0};
-    summary['commited'] = {all: 0, done: 0};
-    summary['readyForTest'] = {all: 0, done: 0};
-    summary['done'] = {all: 0, done: 0};
-
-    $.each($('table#board td.dropable'), function(index,element) {
-        var column = $(element).attr('id');
-
-        var summaryEstimation = 0;
-        $.each($(element).children('div.task').children('span.estimation'), function(i, e) {
-            summaryEstimation += getAsNumber($(e).html());
-        });
-
-        var summaryDone = 0;
-        $.each($(element).children('div.task').children('span.done'), function(i, e) {
-            summaryDone += getAsNumber($(e).html());
-        });
-
-        summary[column].all = summaryEstimation;
-        summary[column].done = summaryDone;
-
-    });
-
-    $('span#todo-sum-estimation').html(summary['todo'].all);
-    $('span#todo-sum-done').html(summary['todo'].done);
-
-    $('span#inProgress-sum-estimation').html(summary['todo'].all + summary['inProgress'].all);
-    $('span#inProgress-sum-done').html(summary['inProgress'].done);
-    
-    $('span#commited-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all);
-    $('span#commited-sum-done').html(summary['commited'].done);
-
-    $('span#readyForTest-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all + summary['readyForTest'].all);
-    $('span#readyForTest-sum-done').html(summary['readyForTest'].done);
-
-    $('span#done-sum-estimation').html(summary['todo'].all + summary['inProgress'].all + summary['commited'].all + summary['readyForTest'].all + summary['done'].all);
-    $('span#done-sum-done').html(summary['done'].done);
-}
-</script>

@@ -3,18 +3,20 @@
  */
 (function($) {
     var generateId = function () {
-        var date = new Date;
+        var date = new Date();
         return Math.floor(Math.random() * 10000000) + '_' + date.getTime();
     };
 
     var mpr = function(value) {
-        if(typeof(console) !== 'undefined')
+        if(typeof(console) !== 'undefined') {
             console.log(value);
+        }
     };
 
     var isset = function (variable) {
-        if(typeof(variable) === 'undefined')
+        if(typeof(variable) === 'undefined') {
             return false;
+        }
         return true;
     };
 
@@ -24,7 +26,7 @@
 
     var time = function () {
         return Math.floor(new Date().getTime()/1000);
-    }
+    };
 
     var Scrumie = function() {
         var Project = function() {
@@ -34,7 +36,7 @@
             };
 
             var del = function(el) {
-                if(el.length == 0) {
+                if(el.length === 0) {
                     alert('Select project you want to untouch');
                     return;
                 }
@@ -49,7 +51,7 @@
             };
 
             var add = function(name) {
-                if(name == '') {
+                if(name === '') {
                     alert('Project name can\'t be empty');
                     return;
                 }
@@ -91,22 +93,24 @@
                 }
 
                 $.post(uri('Project','addNewSprint'), {'name': name}, function(data, status, Request) {
-                    if(data === true)
+                    if(data === true) {
                         window.location.reload();
-                    else
+                    } else {
                         alert(data.error);
+                    }
                 });
             };
 
             var del = function(id) {
-                if (!confirm('Are you sure you want to delete this sprint?\n\nAll information connected with it will be permamently removed!'))
+                if (!confirm('Are you sure you want to delete this sprint?\n\nAll information connected with it will be permamently removed!')) {
                     return;
+                }
 
                 $.post(uri('Project', 'deleteSprint'), {id: id}, function(data) {
-                    if(data == true) {
+                    if(data === true) {
                         $('#sprints-list').find('li[data-sprintId='+id+']').remove();
                     }
-                })
+                });
             };
 
             var edit = function(id) {
@@ -147,7 +151,7 @@
                         newstory.appendTo('div#story-container'); 
                         droppable();
                     }
-                })
+                });
             };
 
             var del = function(story) {
@@ -162,12 +166,13 @@
                 yes.click(function() {
                     var id = $(story).attr('data-storyid');
                     $.post(uri('Project','deleteUserStory'), {id: id}, function(response) {
-                        if(response === true)
+                        if(response === true) {
                             $(story).remove();
-                        else
+                        } else {
                             alert(response.error);
+                        }
                     });
-                })
+                });
 
                 cancel.click(function() {
                     confirm.removeClass('show');
@@ -186,21 +191,50 @@
             };
 
             var detach = function(story) {
-                console.log(story);
                 var id = $(story).attr('data-storyid');
                 $.post(uri('Project','detachUserStory'), {id: id}, function(response) {
-                    if(response === true)
+                    if(response === true) {
                         $(story).remove();
-                    else
+                    }
+                    else {
                         alert(response.error);
+                    }
                 });
+            };
+
+            var recalculate = function(story) {
+
+                var points = $(story).parent().find('tr.points').find('td');
+
+                var done = 0;
+                var estimate = 0;
+
+                $.each($(story).find('td.todo').find('div.task').find('div.status').find('input.estimation'), function() { estimate = estimate + parseInt($(this).val(),10); });
+                $.each($(story).find('td.todo').find('div.task').find('div.status').find('input.done'), function() { done = done + parseInt($(this).val(),10); });
+                points.eq(0).html(done + '/' + estimate);
+
+                done = 0;
+                $.each($(story).find('td.inProgress').find('div.task').find('div.status').find('input.estimation'), function() { estimate = estimate + parseInt($(this).val(),10); });
+                $.each($(story).find('td.inProgress').find('div.task').find('div.status').find('input.done'), function() { done = done + parseInt($(this).val(),10); });
+                points.eq(1).html(done + '/' + estimate);
+
+                done = 0;
+                $.each($(story).find('td.toVerify').find('div.task').find('div.status').find('input.estimation'), function() { estimate = estimate + parseInt($(this).val(),10); });
+                $.each($(story).find('td.toVerify').find('div.task').find('div.status').find('input.done'), function() { done = done + parseInt($(this).val(),10); });
+                points.eq(2).html(done + '/' + estimate);
+
+                done = 0;
+                $.each($(story).find('td.done').find('div.task').find('div.status').find('input.estimation'), function() { estimate = estimate + parseInt($(this).val(),10); });
+                $.each($(story).find('td.done').find('div.task').find('div.status').find('input.done'), function() { done = done + parseInt($(this).val(),10); });
+                points.eq(3).html(done + '/' + estimate);
             };
 
             return {
                 add: add,
                 del: del,
                 edit: edit,
-                detach: detach
+                detach: detach,
+                recalculate: recalculate
             };
         }();
 
@@ -263,10 +297,11 @@
                 };
 
                 $.post(uri('Project', 'saveTask'), params, function(response) {
-                    if(response)
-                        task.attr('id', response)
-                    else
+                    if(response) {
+                        task.attr('id', response);
+                    } else {
                         alert('Problem with saving data');
+                    }
                 });
             };
 
@@ -288,7 +323,7 @@
                             alert(respone.error);
                         }
                     });
-                })
+                });
 
                 cancel.click(function() {
                     confirm.removeClass('show');
@@ -297,10 +332,10 @@
 
             var changeProgress = function(event, el) {
                 if(event.keyCode == 38) {
-                    $(el).val(parseInt($(el).val()) + 1);
+                    $(el).val(parseInt($(el).val(),10) + 1);
                     $(el).change();
                 } else if (event.keyCode==40) {
-                    $(el).val(parseInt($(el).val()) - 1);
+                    $(el).val(parseInt($(el).val(),10) - 1);
                     $(el).change();
                 }
             };
@@ -323,12 +358,12 @@
 
                 return {
                     add: add
-                }
+                };
             }();
 
             return {
                 Story: Story
-            }
+            };
         }();
 
         var logout = function() {
@@ -344,6 +379,7 @@
                 drop: function(event,ui) {
                     ui.helper.appendTo(this);
                     $(this).removeClass('over');
+                    Story.recalculate($(this).parent());
                 },
                 over: function(event, ui) {
                     $(this).addClass('over');
@@ -387,15 +423,15 @@
 
         $( "#tabs" ).tabs();
 
-        var tabIndex = parseInt($.getUrlVar('tab'));
+        var tabIndex = parseInt($.getUrlVar('tab'),10);
         if(tabIndex) {
-            $( "#tabs" ).tabs({ selected: parseInt(tabIndex) });
+            $( "#tabs" ).tabs({ selected: parseInt(tabIndex,10) });
         }
         else if($.getUrlVar('sprint')) {
             $( "#tabs" ).tabs({ selected: 1 });
         }
 
-        setInterval("$.get('?controller=Index&action=keepAlive')", 100000); 
+        setInterval( function() {$.get('?controller=Index&action=keepAlive'); }, 100000);
 
         $('form#registryForm input[type="submit"]').click(function() {
             var formData = $('form#registryForm').serializeArray();
@@ -407,7 +443,7 @@
                     alert("Registration success.\nYou can now login to your account");
                 }
                 else {
-                    alert(data.error)
+                    alert(data.error);
                 }
             });
 
@@ -437,7 +473,7 @@
             closeOnEscape: false,
             draggable: false,
             resizable: false,
-            dialogClass: 'loginDialog',
+            dialogClass: 'loginDialog'
         });
 
         Scrumie.droppable();
@@ -454,10 +490,9 @@
  */
 $.extend({
   getUrlVars: function(){
-    var vars = [], hash;
+    var vars = [], hash, i;
     var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for(var i = 0; i < hashes.length; i++)
-    {
+    for(i = 0; i < hashes.length; i += 1) {
       hash = hashes[i].split('=');
       vars.push(hash[0]);
       vars[hash[0]] = hash[1];

@@ -5,15 +5,19 @@ h1 {font-size: 18px}
 .href:hover {text-decoration: underline;}
 .hidden {display: none !important}
 .draggable {cursor: move}
+.tabContent {padding: 13px; background: #999;}
+.confirm_delete { display: none; position: absolute; z-index: 100; background: #80ff00; padding: 5px; border-radius: 5px;}
+.confirm_delete.show { display: inline;}
+.noneditable {border: 0; background: inherit; padding: 3px; display: inline-block;}
+.over {border: 2px solid red !important;}
+.icon { position: relative; top: 5px; padding-left: 5px; padding-right: 5px; cursor: pointer;}
+
 
 #registryDialog {margin-top: 10px;}
 .loginDialog div.ui-dialog-titlebar {display: none;}
 
-.over {border: 1px dashed red ;}
-.tabContent {padding: 13px; background: #999;}
-
 /* tabs */
-div#tabs ul li {height: 28px;}
+    div#tabs ul li {height: 28px;}
 
 /* home tab */
     table.home td {border: 0;}
@@ -44,7 +48,11 @@ div#tabs ul li {height: 28px;}
     table.user_story tr.title td img { width: 16px;}
     table.user_story tr.points td { background: #f5f5f5; font-size: 10px; padding: 0; border: 0; text-align: center; font-weight: bold;}
 
-    /* task */
+    td.user-story {background: #ddd; width: 100px;}
+    #detached table tr td.inProgress {display: none}
+    #detached table tr td.toVerify {display: none}
+    #detached table tr td.done {display: none}
+
     div.task { position: relative; background-color: #ddd; float: left; display: inline-block; margin: 5px; border: 1px solid #aaa; font-size: 11px; font-family: Helvetica,Arial,sans-serif; box-shadow: 2px 2px 5px #aaa;}
     div.task div.body {max-height: 50px; max-width: 300px; padding: 5px 5px; overflow: hidden}
     div.task div.status { background: lightgray; white-space: nowrap; text-align: right;}
@@ -52,7 +60,6 @@ div#tabs ul li {height: 28px;}
     div.task select.noneditable.owner { background: none;}
     div.estimation {font-weight: bold; padding: 0; padding-left: 2px; padding-right: 2px}
 
-    .noneditable {border: 0; background: inherit; padding: 3px; display: inline-block;}
     button.color.noneditable {display: none;}
     div.task input.noneditable {width: 20px; text-align: center; background: inherit; border: 0}
 
@@ -72,28 +79,12 @@ div#tabs ul li {height: 28px;}
     div.task.editable button.color.green {background: green;}
     div.task.editable button.color.gray {background: gray;}
 
-    td.user-story {background: #ddd; width: 100px;}
-
-
-.ui-tabs {background: none;}
-.ui-tabs-nav {padding: 0 !important;}
-.ui-corner-all {border-radius: 0;}
-.ui-widget-content {border: 0;}
-.ui-widget-header {border: 0; background: none;}
-.ui-tabs.ui-tabs-nav {padding: 0;}
-.ui-tabs-panel {background: #fefefe !important;}
-
-.ui-tabs .ui-tabs-nav li {border: 0; margin-right: 1px; padding: 0; top: 0; border-radius: 2px;}
-
-.over {border: 2px solid red !important;}
-
-.delete_user_story { position: relative; top: 5px; padding-left: 5px; padding-right: 5px; cursor: pointer;}
-.move_to_backlog { position: relative; top: 5px; padding-left: 5px; padding-right: 5px; cursor: pointer;}
-.add_new_task { position: relative; top: 5px; padding-left: 5px; padding-right: 5px; cursor: pointer;}
-
-#detached table tr td.inProgress {display: none}
-#detached table tr td.readyForTest {display: none}
-#detached table tr td.done {display: none}
-
-.confirm_delete { display: none; position: absolute; z-index: 100; background: #80ff00; padding: 5px; border-radius: 5px;}
-.confirm_delete.show { display: inline;}
+/* jquery ui overwrite */
+    .ui-tabs {background: none;}
+    .ui-tabs-nav {padding: 0 !important;}
+    .ui-corner-all {border-radius: 0;}
+    .ui-widget-content {border: 0;}
+    .ui-widget-header {border: 0; background: none;}
+    .ui-tabs.ui-tabs-nav {padding: 0;}
+    .ui-tabs-panel {background: #fefefe !important;}
+    .ui-tabs .ui-tabs-nav li {border: 0; margin-right: 1px; padding: 0; top: 0; border-radius: 2px;}

@@ -224,9 +224,8 @@
         }();
 
         var Story = function() {
-            var add = function(newstory, callback) {
-
-                $.post(uri('Project', 'addNewUserStory'), function(data) {
+            var add = function(newstory, place, callback) {
+                $.post(uri('Project', 'addNewUserStory'), {place: place}, function(data) {
                     if(data) {
                         newstory.attr('data-storyid', data);
                         droppable();

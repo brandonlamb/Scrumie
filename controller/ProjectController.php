@@ -95,7 +95,9 @@ class ProjectController extends AppController
 
     public function addNewUserStoryAction() {
         $story = new Story;
-        $story->id_sprint = $this->getCurrentSprintId();
+        if($this->getParam('place') == 'sprint') {
+            $story->id_sprint = $this->getCurrentSprintId();
+        }
         $story->id_project = $this->getCurrentProjectId();
         $story->save();
         $this->result = $story->id;

@@ -295,14 +295,14 @@ $(document).ready(function() {
 
         $('#tabs-backlog button.add_new_user_story').click(function(event) {
             var story = $('#newuserstory').find('table').clone();
-            Scrumie.Story.add(story, function() {
+            Scrumie.Story.add(story, 'backlog', function() {
                 story.appendTo('div#detached'); 
             });
         });
 
         $('#tabs-board button.add_new_user_story').click(function(event) {
             var story = $('#newuserstory').find('table').clone();
-            Scrumie.Story.add(story, function() {
+            Scrumie.Story.add(story, 'sprint', function() {
                 story.appendTo('div#story-container'); 
             });
         });

@@ -119,12 +119,19 @@ class ProjectController extends AppController
             throw new AppControllerException('Invalid project id for user story');
         } 
 
-        if($story->id_sprint) {
-            $story->id_sprint = null;
-        } else {
-            $story->id_sprint = $this->getCurrentSprintId();
-        }
+        $story->id_sprint = null;
+        $story->save();
+        $this->result = true;
+    }
 
+    public function attachUserStoryAction() {
+        $story = Story::getById((int) $this->getParam('id'));
+
+        if($story->id_project != $this->getCurrentProjectId()) {
+            throw new AppControllerException('Invalid project id for user story');
+        } 
+
+        $story->id_sprint = $this->getCurrentSprintId();
         $story->save();
         $this->result = true;
     }

@@ -82,30 +82,8 @@
         }
     }());
 
-    var generateId = function () {
-        var date = new Date();
-        return Math.floor(Math.random() * 10000000) + '_' + date.getTime();
-    };
-
-    var mpr = function(value) {
-        if(typeof(console) !== 'undefined') {
-            console.log(value);
-        }
-    };
-
-    var isset = function (variable) {
-        if(typeof(variable) === 'undefined') {
-            return false;
-        }
-        return true;
-    };
-
     var uri = function(controller, action) {
         return '?controller='+controller+'&action='+action;
-    };
-
-    var time = function () {
-        return Math.floor(new Date().getTime()/1000);
     };
 
     var Scrumie = function() {

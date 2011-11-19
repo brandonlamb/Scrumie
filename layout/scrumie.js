@@ -133,12 +133,35 @@
                 }
             };
 
+            var refreshSummaryPoints = function() {
+                var estimate = 0, done = 0, container, board;
+
+                board = $('#story-container');
+
+                function refresh (columnName) {
+                    $.each(board.find('.' + columnName).find('.task').find('.status').find('input.estimation'), function() {
+                        estimate += parseInt($(this).val(),10);
+                    });
+                    $.each(board.find('.' + columnName).find('.task').find('.status').find('input.done'), function() {
+                        done += parseInt($(this).val(),10);
+                    });
+
+                    board.find('table.header').find('.summary.' + columnName).find('em').eq(0).html(done);
+                    board.find('table.header').find('.summary.' + columnName).find('em').eq(1).html(estimate);
+                }
+
+                refresh('todo');
+                refresh('inProgress');
+                refresh('toVerify');
+                refresh('done');
+            };
 
             return {
                 add: add,
                 del: del,
                 edit: edit,
-                select: select
+                select: select,
+                refreshSummaryPoints: refreshSummaryPoints
             };
         }();
 
@@ -247,6 +270,7 @@
                         $(this).css('top', 0);
                         $(this).css('left', 0);
                         save(this);
+                        Sprint.refreshSummaryPoints();
                     }
                 });
             };
@@ -295,6 +319,8 @@
                     estimation: task.find('input.estimation').val(),
                     done: task.find('input.done').val()
                 };
+
+                Scrumie.Sprint.refreshSummaryPoints();
 
                 $.post(uri('Project', 'saveTask'), params, function(response) {
                     if(response) {

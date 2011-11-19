@@ -216,10 +216,10 @@ function prepareUserStory($story, $project) {
         <div id="story-container">
             <table class="user_story header">
             <tr>
-                <th>TODO<span class="summary"><em></em>/<em></em></span></th>
-                <th>IN PROGRESS<span class="summary"><em></em>/<em></em></span></th>
-                <th>TO VERIFY<span class="summary"><em></em>/<em></em></span></th>
-                <th>DONE<span class="summary"><em></em>/<em></em></span></th>
+                <th>TODO<span class="summary todo"><em></em>/<em></em></span></th>
+                <th>IN PROGRESS<span class="summary inProgress"><em></em>/<em></em></span></th>
+                <th>TO VERIFY<span class="summary toVerify"><em></em>/<em></em></span></th>
+                <th>DONE<span class="summary done"><em></em>/<em></em></span></th>
             </tr>
             </table>
             <?php foreach($this->sprint->getStories() as $story): ?>
@@ -266,6 +266,8 @@ function prepareUserStory($story, $project) {
               }]
            });
         });
+        
+        Scrumie.Sprint.refreshSummaryPoints();
 
         function reloadBtc() {
             location.href = location.href.replace(/&tab.*/, '') + '&tab=2';

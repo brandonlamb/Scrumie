@@ -2,6 +2,86 @@
  * Scrumie API
  */
 (function($) {
+    /**
+     *  Jquery extensions
+     */
+    (function() {
+        /**
+         * Extends jQuery for getUrlVars method
+         */
+        $.extend({
+          getUrlVars: function(){
+            var vars = [], hash, i;
+            var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+            for(i = 0; i < hashes.length; i += 1) {
+              hash = hashes[i].split('=');
+              vars.push(hash[0]);
+              vars[hash[0]] = hash[1];
+            }
+            return vars;
+          },
+          getUrlVar: function(name){
+            return $.getUrlVars()[name];
+          }
+        });
+
+        /**
+         * .disableTextSelect - Disable Text Select Plugin
+         *
+         * Version: 1.1
+         * Updated: 2007-11-28
+         *
+         * Used to stop users from selecting text
+         *
+         * Copyright (c) 2007 James Dempster (letssurf@gmail.com, http://www.jdempster.com/category/jquery/disabletextselect/)
+         *
+         * Dual licensed under the MIT (MIT-LICENSE.txt)
+         * and GPL (GPL-LICENSE.txt) licenses.
+         **/
+        if ($.browser.mozilla) {
+            $.fn.disableTextSelect = function() {
+                return this.each(function() {
+                    $(this).css({
+                        'MozUserSelect' : 'none'
+                    });
+                });
+            };
+            $.fn.enableTextSelect = function() {
+                return this.each(function() {
+                    $(this).css({
+                        'MozUserSelect' : ''
+                    });
+                });
+            };
+        } else if ($.browser.msie) {
+            $.fn.disableTextSelect = function() {
+                return this.each(function() {
+                    $(this).bind('selectstart.disableTextSelect', function() {
+                        return false;
+                    });
+                });
+            };
+            $.fn.enableTextSelect = function() {
+                return this.each(function() {
+                    $(this).unbind('selectstart.disableTextSelect');
+                });
+            };
+        } else {
+            $.fn.disableTextSelect = function() {
+                return this.each(function() {
+                    $(this).bind('mousedown.disableTextSelect', function() {
+                        return false;
+                    });
+                });
+            };
+            $.fn.enableTextSelect = function() {
+                return this.each(function() {
+                    $(this).unbind('mousedown.disableTextSelect');
+                });
+            };
+        }
+    }());
+
     var generateId = function () {
         var date = new Date();
         return Math.floor(Math.random() * 10000000) + '_' + date.getTime();
@@ -166,13 +246,13 @@
         }();
 
         var Story = function() {
-            var add = function(newstory) {
+            var add = function(newstory, callback) {
 
                 $.post(uri('Project', 'addNewUserStory'), function(data) {
                     if(data) {
                         newstory.attr('data-storyid', data);
-                        newstory.appendTo('div#story-container'); 
                         droppable();
+                        callback();
                     }
                 });
             };
@@ -213,11 +293,23 @@
                 });
             };
 
+            var attach = function(story) {
+                var id = $(story).attr('data-storyid');
+                $.post(uri('Project','attachUserStory'), {id: id}, function(response) {
+                    if(response === true) {
+                        story.appendTo('div#story-container'); 
+                    }
+                    else {
+                        alert(response.error);
+                    }
+                });
+            };
+
             var detach = function(story) {
                 var id = $(story).attr('data-storyid');
                 $.post(uri('Project','detachUserStory'), {id: id}, function(response) {
                     if(response === true) {
-                        $(story).remove();
+                        story.appendTo('div#detached'); 
                     }
                     else {
                         alert(response.error);
@@ -257,6 +349,7 @@
                 del: del,
                 edit: edit,
                 detach: detach,
+                attach: attach,
                 recalculate: recalculate
             };
         }();
@@ -342,13 +435,17 @@
                 cancel.unbind('click');
 
                 yes.click(function() {
-                    $.post(uri('Project', 'deleteTask'), {id: task.attr('id')}, function(response) {
-                        if(response === true) {
-                            task.remove();
-                        } else {
-                            alert(respone.error);
-                        }
-                    });
+                    if(task.attr('id')) {
+                        $.post(uri('Project', 'deleteTask'), {id: task.attr('id')}, function(response) {
+                            if(response === true) {
+                                task.remove();
+                            } else {
+                                alert(respone.error);
+                            }
+                        });
+                    } else {
+                        task.remove();
+                    }
                 });
 
                 cancel.click(function() {
@@ -372,23 +469,6 @@
                 save: save,
                 del: del,
                 changeProgress: changeProgress
-            };
-        }();
-
-        var Backlog = function() {
-            var Story = function() {
-                var add = function(newstory) {
-                    newstory.appendTo('#detached'); 
-                    droppable();
-                };
-
-                return {
-                    add: add
-                };
-            }();
-
-            return {
-                Story: Story
             };
         }();
 
@@ -431,7 +511,6 @@
             Project: Project,
             Sprint: Sprint,
             Story: Story,
-            Backlog: Backlog,
             Task: Task,
             login: login,
             logout: logout,
@@ -509,82 +588,3 @@
 
     window.Scrumie = Scrumie;
 })(jQuery);
-
-
-/**
- * Extends jQuery for getUrlVars method
- */
-$.extend({
-  getUrlVars: function(){
-    var vars = [], hash, i;
-    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-    for(i = 0; i < hashes.length; i += 1) {
-      hash = hashes[i].split('=');
-      vars.push(hash[0]);
-      vars[hash[0]] = hash[1];
-    }
-    return vars;
-  },
-  getUrlVar: function(name){
-    return $.getUrlVars()[name];
-  }
-});
-
-/**
- * .disableTextSelect - Disable Text Select Plugin
- *
- * Version: 1.1
- * Updated: 2007-11-28
- *
- * Used to stop users from selecting text
- *
- * Copyright (c) 2007 James Dempster (letssurf@gmail.com, http://www.jdempster.com/category/jquery/disabletextselect/)
- *
- * Dual licensed under the MIT (MIT-LICENSE.txt)
- * and GPL (GPL-LICENSE.txt) licenses.
- **/
-(function($) {
-    if ($.browser.mozilla) {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).css({
-                    'MozUserSelect' : 'none'
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).css({
-                    'MozUserSelect' : ''
-                });
-            });
-        };
-    } else if ($.browser.msie) {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).bind('selectstart.disableTextSelect', function() {
-                    return false;
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).unbind('selectstart.disableTextSelect');
-            });
-        };
-    } else {
-        $.fn.disableTextSelect = function() {
-            return this.each(function() {
-                $(this).bind('mousedown.disableTextSelect', function() {
-                    return false;
-                });
-            });
-        };
-        $.fn.enableTextSelect = function() {
-            return this.each(function() {
-                $(this).unbind('mousedown.disableTextSelect');
-            });
-        };
-    }
-})(jQuery);
-

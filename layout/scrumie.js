@@ -166,13 +166,13 @@
 
                 $.post(uri('Project', 'deleteSprint'), {id: id}, function(data) {
                     if(data === true) {
-                        $('#sprints-list').find('li[data-sprintId='+id+']').remove();
+                        location.href = uri('Board', 'project');
                     }
                 });
             };
 
             var edit = function(id) {
-                var el = $('#sprints-list').find('li[data-sprintId='+id+']');
+                var el = $('li[data-sprintId='+id+']');
                 el.find('span.href').attr('contenteditable', true);
                 el.find('span.href').focus();
                 el.find('span.href').blur(function() {
@@ -184,10 +184,9 @@
             };
 
             var select = function(id) {
-                var el = ($('#sprints-list').find('li[data-sprintId='+id+']').find('span.href'));
-                
+                var el = $('li[data-sprintId='+id+']').find('span');
                 if (el.attr('contenteditable') === 'false') {
-                    location.href = uri('Board', 'sprint') + '&id=' + id + '&tab=1';
+                    location.href = uri('Board', 'sprint') + '&id=' + id;
                 }
             };
 

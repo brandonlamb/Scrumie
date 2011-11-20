@@ -106,86 +106,67 @@ function prepareUserStory($story, $project) {
         <?php if(isset($this->sprint)): ?>
             <li><a href="#tabs-burndownchart">Burn down chart</a></li>
         <?php endif ?>
-        <li><a id="#logout">Logout</a></li>
+        <li><a id="logout">Logout</a></li>
     </ul>
 
     <!-- HOME -->
     <div id="tabs-home" class="tabContent">
-        <table class="home">
-            <tr><th>Welcome!</th><td style="font-weight: bold; font-size: 18px;"><?= $this->user->login; ?>
-            </td></tr>
-            <tr>
-                <th style="vertical-align: top">Projects:</th>
-                <td>
-                    <fieldset>
-                        <legend>
-                            <input id="new-project-name" type="text" placeholder="New project name">
-                            <button title="Add new project" onclick="Scrumie.Project.add($('#new-project-name').val())">+</button>
-                            <button title="Untouch/Delete project.&#13;Project will be deleted when no others contributors are assigned to it, otherwise it will be untouch only from your account" onclick="Scrumie.Project.del($('.projectName.selected'))">-</button>
-                        </legend>
-                        <div style="padding: 10px;">
-                        <?php
-                        $projects = array();
-                        foreach($this->user->projects as $userProject) {
-                            $project = $userProject->project;
-                            $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
-                            $projects[] = '<div data-projectId="'.$project->id.'" onclick="Scrumie.Project.select('.$project->id.')" class="projectName '.$class.'">'.$project->name.'</div>';
+        <p>Welcome! <strong><?= $this->user->login; ?></strong></p>
+        <div id="columns">
+            <div>
+                <h1>Projects:</h1>
+                <input id="new-project-name" type="text" placeholder="New project name"><button title="Add new project" onclick="Scrumie.Project.add($('#new-project-name').val())">+</button>
+                <button title="Untouch/Delete project.&#13;Project will be deleted when no others contributors are assigned to it, otherwise it will be untouch only from your account" onclick="Scrumie.Project.del($('.projectName.selected'))">-</button>
+                <ol>
+                <?php 
+                foreach($this->user->projects as $userProject) {
+                    $project = $userProject->project;
+                    $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
+                    echo '<li data-projectId="'.$project->id.'" onclick="Scrumie.Project.select('.$project->id.')" class="projectName href '.$class.'">'.$project->name.'</li>';
+                }
+                ?>
+                </ol>
+            </div>
+            <div>
+                <h1>Sprints:</h1>
+                <input id="new-sprint-name" type="text" placeholder="sprint name">
+                <button title="Add new sprint" onclick="Scrumie.Sprint.add($(this).parent().find('input').val())">+</button>
+                <button title="Delete current sprint" onclick="Scrumie.Sprint.del($('li.sprint.selected').attr('data-sprintId'))">-</button>
+                <button title="Edit current sprint name" onclick="Scrumie.Sprint.edit($('li.sprint.selected').attr('data-sprintId'))">!</button>
+                <ol>
+                    <?php
+                    if(isset($this->project)) {
+                        foreach($this->project->sprints as $sprint) {
+                            $class = (isset($this->sprint) && $sprint->id == $this->sprint->id) ? 'selected' : '';
+                            echo "<li data-sprintId='{$sprint->id}' class='href sprint {$class}' onclick='Scrumie.Sprint.select({$sprint->id})'><span contenteditable='false'>{$sprint->name}</span></li>";
                         }
-                        echo join('', $projects);
-                        ?>
-                        </div>
-                    </fieldset>
-                </td>
-            </tr>
-
-            <?php if(isset($this->project)): ?>
-            <tr><th style="vertical-align: top;" >Spints:</th>
-                <td style="padding: 0">
-                    <fieldset>
-                        <legend>
-                            <input id="new-sprint-name" type="text" placeholder="sprint name">
-                            <button title="Add new sprint" onclick="Scrumie.Sprint.add($(this).parent().find('input').val())">+</button>
-                        </legend>
-                        <ul id="sprints-list">
-                            <?php
-                            foreach($this->project->sprints as $sprint) {
-                                $edit = '<span onclick="Scrumie.Sprint.edit('.$sprint->id.')" class="ui-icon ui-icon-pencil icon" title="Edit sprint name" ></span>';
-                                $delete = '<span onclick="Scrumie.Sprint.del('.$sprint->id.')" class="ui-icon ui-icon-trash icon" title="Delete" ></span>';
-
-                                echo "<li data-sprintId='{$sprint->id}' class='sprint'><span contenteditable='false' onclick='Scrumie.Sprint.select({$sprint->id});' class='href' style='padding: 2px; margin-right: 10px;'>{$sprint->name}</span>$edit&nbsp;$delete</li>";
-                            }
-                            ?>
-                        </ul>
-                    </fieldset>
-                </td>
-            </tr>
-
-            <tr><th style="vertical-align: top;">Contributors:</th>
-                <td style="padding: 0">
-                    <fieldset class="contributors">
-                        <legend>
-                            <input id="new-contributor-name" type="text" placeholder="username">
-                            <button title="Add new contributor" onclick="Scrumie.Project.addUser($('#new-contributor-name').val())">+</button>
-                        </legend>
-                        <blockquote>
-                        <?php
-                        $contributors = array();
-                        foreach($this->project->users as $projectUser) {
-                            $user = $projectUser->user;
-                            if($user->email) {
-                                $contributors[] = '<a href="mailto:'.$user->email.'">'.$user->login.'</a>';
-                            } else {
-                                $contributors[] = '<span>'.$user->login.'</span>';
-                            }
+                    }
+                    ?>
+                </ol>
+            </div>
+            <div>
+                <h1>Contributors:</h1>
+                <p>
+                    <input id="new-contributor-name" type="text" placeholder="username">
+                    <button title="Add new contributor" onclick="Scrumie.Project.addUser($('#new-contributor-name').val())">+</button>
+                </p>
+                <?php
+                if($this->project) {
+                    $contributors = array();
+                    foreach($this->project->users as $projectUser) {
+                        $user = $projectUser->user;
+                        if($user->email) {
+                            $contributors[] = '<a href="mailto:'.$user->email.'">'.$user->login.'</a>';
+                        } else {
+                            $contributors[] = '<span>'.$user->login.'</span>';
                         }
-                        echo join(', ', $contributors);
-                        ?>
-                        </blockquote>
-                    </fieldset>
-                </td>
-            </tr>
-            <?php endif ?>
-        </table>
+                    }
+                    echo join(', ', $contributors);
+                }
+                ?>
+            </div>
+        </div>
+        <div style="clear: both;"></div>
     </div>
 
     <!-- BACKLOG -->

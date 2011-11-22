@@ -38,9 +38,10 @@ h1 {font-size: 18px}
     #detached table tr td.inProgress {display: none}
     #detached table tr td.toVerify {display: none}
     #detached table tr td.done {display: none}
+    #detached div.task { max-width: 300px; }
 
-    div.task { position: relative; background-color: #ddd; float: left; display: inline-block; margin: 5px; border: 1px solid #aaa; font-size: 11px; font-family: Helvetica,Arial,sans-serif; box-shadow: 2px 2px 5px #aaa;}
-    div.task div.body {max-height: 50px; max-width: 300px; padding: 5px 5px; overflow: hidden}
+    div.task { position: relative; background-color: #ddd; float: left; width: 90%; display: inline-block; margin: 5px; border: 1px solid #aaa; font-size: 11px; font-family: Helvetica,Arial,sans-serif; box-shadow: 2px 2px 5px #aaa;}
+    div.task div.body {max-height: 50px; padding: 5px 5px; overflow: hidden}
     div.task div.status { background: lightgray; white-space: nowrap; text-align: right;}
     div.task div.status img.delete_task {position: relative; top: 4px; cursor: pointer; width: 16px;}
     div.task select.noneditable.owner { background: none;}

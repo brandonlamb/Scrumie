@@ -242,7 +242,8 @@
                 yes.unbind('click');
                 cancel.unbind('click');
 
-                yes.click(function() {
+                yes.click(function(event) {
+                    event.stopPropagation();
                     var id = $(story).attr('data-storyid');
                     $.post(uri('Project','deleteUserStory'), {id: id}, function(response) {
                         if(response === true) {
@@ -253,7 +254,8 @@
                     });
                 });
 
-                cancel.click(function() {
+                cancel.click(function(event) {
+                    event.stopPropagation();
                     confirm.removeClass('show');
                 });
             };
@@ -353,24 +355,15 @@
                     task.find('button, input').removeClass('noneditable');
                     task.find('div.body').attr('contenteditable', true);
                     task.find('div.body').focus();
-                    task.find('div.body').unbind('blur');
-                    task.find('div.body').unbind('focus');
-                    task.find('button.color').click(function() {
-                        task.find('div.body').css('background-color', $(this).attr('data-color'));
-                    });
                     task.fadeTo('slow', 1.0, function() {
-                        task.click(function(event) {
-                            event.stopPropagation();
-                        });
-                        $(document).click(function() {
+                        $('td.droppable').dblclick(function() {
                             task.removeClass('editable');
-                            task.find('div.body').attr('contenteditable', true);
                             task.draggable('option', 'disabled', false);
                             task.find('button, input').addClass('noneditable');
+                            task.find('div.body').attr('contenteditable', false);
                             task.find('.confirm_delete button').removeClass('noneditable');
-                            task.find('button.color').unbind('click');
                             save(task); 
-                            $(document).unbind('click');
+                            $('td.droppable').unbind('dblclick');
                         });
                     });
                 });
@@ -400,7 +393,7 @@
                 });
             };
 
-            var del = function(element) {
+            var del = function(element, callback) {
                 var task = $(element);
                 var confirm = $(task).find('.confirm_delete').addClass('show');
 
@@ -410,11 +403,15 @@
                 yes.unbind('click');
                 cancel.unbind('click');
 
-                yes.click(function() {
+                yes.click(function(event) {
+                    event.stopPropagation();
                     if(task.attr('id')) {
                         $.post(uri('Project', 'deleteTask'), {id: task.attr('id')}, function(response) {
                             if(response === true) {
                                 task.remove();
+                                if(callback) {
+                                    callback();
+                                }
                             } else {
                                 alert(respone.error);
                             }
@@ -424,7 +421,8 @@
                     }
                 });
 
-                cancel.click(function() {
+                cancel.click(function(event) {
+                    event.stopPropagation();
                     confirm.removeClass('show');
                 });
             };

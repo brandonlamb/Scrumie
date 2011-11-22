@@ -20,16 +20,14 @@ function prepareTask(Task $task, $project) {
 
     $taskHelper = '
         <div id="%s" class="task draggable">
-            <div class="body" style="background-color: %s" ondblclick="Scrumie.Task.edit($(this).parent())" >%s</div>
+            <div class="body" style="background-color: %s" contenteditable="false">%s</div>
             <div class="status">
-                <input onchange="Scrumie.Task.save($(this).parent().parent()); Scrumie.Story.recalculate($(this).parent().parent().parent().parent());" onkeyup="Scrumie.Task.changeProgress(event, this)" title="Done" class="done noneditable" value="%s"/>
-                /
-                <input title="Estimation" onchange="Scrumie.Task.save($(this).parent().parent()); Scrumie.Story.recalculate($(this).parent().parent().parent().parent());" onkeyup="Scrumie.Task.changeProgress(event, this)" class="estimation noneditable" value="%s"/>
-                <select title="Owner" onchange="Scrumie.Task.save($(this).parent().parent())" name="owner" class="owner">%s</select>
-                <img class="delete_task" onclick="Scrumie.Task.del($(this).parent().parent())" src="http://cdn1.iconfinder.com/data/icons/uidesignicons/delete.png" title="Delete task" />
-                <span class="confirm_delete"> <em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button> </span>
+                <input title="Done" class="done noneditable" value="%s"/>/<input title="Estimation" class="estimation noneditable" value="%s"/>
+                <select title="Owner" name="owner" class="owner">%s</select>
                 <button data-color="#F79F81" class="color red noneditable"></button><button data-color="lightgreen" class="color green noneditable"></button><button data-color="lightblue" class="color blue noneditable"></button><button data-color="#FFFECB" class="color yellow noneditable"></button><button data-color="#ddd" class="color gray noneditable"></button>
-                <span style="display: inline-block; margin-right: 1px;">
+                <img class="delete_task" src="http://cdn1.iconfinder.com/data/icons/uidesignicons/delete.png" title="Delete task" />
+                <span class="confirm_delete"><em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button></span>
+                <span style="display: inline-block; width: 2px;"></span>
             </div>
         </div>';
 
@@ -274,6 +272,44 @@ $(document).ready(function() {
             Scrumie.Story.attach($(this).parent().parent().parent().parent());
         })
 
+        $('img.delete_task').live('click', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.del($(this).parent().parent(), function() {
+                Scrumie.Sprint.refreshSummaryPoints();
+            });
+        })
+
+        $('input.estimation').live('click', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.save($(this).parent().parent()); 
+            Scrumie.Story.recalculate($(this).parent().parent().parent().parent());
+        })
+
+        $('input.estimation').live('keyup', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.changeProgress(event, this);
+        })
+
+        $('input.done').live('click', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.save($(this).parent().parent()); 
+            Scrumie.Story.recalculate($(this).parent().parent().parent().parent());
+        })
+
+        $('select.owner').live('change', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.save($(this).parent().parent());
+        })
+
+        $('select.owner').live('click', function(event) {
+            event.stopPropagation();
+        })
+
+        $('input.done').live('keyup', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.changeProgress(event, this);
+        })
+
         $('#tabs-backlog button.add_new_user_story').click(function(event) {
             var story = $('#newuserstory').find('table').clone();
             Scrumie.Story.add(story, 'backlog', function() {
@@ -286,6 +322,19 @@ $(document).ready(function() {
             Scrumie.Story.add(story, 'sprint', function() {
                 story.appendTo('div#story-container'); 
             });
+        });
+
+        $('div.task div.body[contenteditable=true]').live('click', function(event) {
+            event.stopPropagation();
+        });
+
+        $('div.task div.body[contenteditable=false]').live('dblclick', function(event) {
+            Scrumie.Task.edit($(this).parent());
+        });
+
+        $('button.color').live('click', function(event) {
+            event.stopPropagation();
+            $(this).parent().parent().find('div.body').css('background-color', $(this).attr('data-color'));
         });
     }());
 });

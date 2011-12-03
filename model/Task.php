@@ -23,7 +23,6 @@ class Task extends DbModel
         'id' => null,
         'body' => null,
         'estimation' => null,
-        'id_sprint' => null,
         'owner' => null,
         'state' => null,
         'done' => null,

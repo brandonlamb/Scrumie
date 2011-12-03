@@ -12,12 +12,12 @@ class UserProject extends DbModel
         'id_project' => null,
     );
 
-    protected $project;
-    protected $user;
+    public function getProject() {
+        return Project::getById($this->id_project);
+    }
 
-    public function _init() {
-        $this->project = new Relation('Project', array('id' => 'id_project'), true);
-        $this->user = new Relation('User', array('id' => 'id_user'), true);
+    public function getUser() {
+        return User::getById($this->id_user);
     }
 
     static public function assignProjectToUser(Project $project, User $user) {

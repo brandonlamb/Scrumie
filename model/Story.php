@@ -7,8 +7,8 @@ class Story extends DbModel
 
     protected $data = array(
         'id' => null,
-        'id_sprint' => null,
         'id_project' => null,
+        'active' => false,
         'name' => 'As an user I... (Double click to edit)',
     );
 
@@ -20,12 +20,8 @@ class Story extends DbModel
         }
     }
 
-    public function getSprint() {
-        return Sprint::getById($this->id_sprint);
-    }
-
     public function save() {
-        if(!$this->id_sprint) {
+        if(!$this->active) {
             foreach($this->getTasks() as $task) {
                 $task->state = 'todo';
                 $task->save();

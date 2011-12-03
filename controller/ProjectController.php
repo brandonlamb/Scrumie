@@ -23,34 +23,6 @@ class ProjectController extends AppController
         $this->result = true;
     }
 
-    public function addNewSprintAction() {
-        $sprint = new Sprint();
-        $sprint->name = $this->getParam('name');
-        $sprint->startdate = date('Y-m-d H:i:s', time());
-        $sprint->id_project = $this->getCurrentProjectId();
-        $sprint->save();
-        $this->result = true;
-    }
-
-    public function deleteSprintAction() {
-        $sprint = Sprint::getById($this->getParam('id'));
-
-        if($sprint->id_project != $this->getCurrentProjectId())
-            throw new AppControllerException(sprintf('You can delete sprint only from current selected projects'));
-
-        $sprint->delete();
-        $this->result = true;
-    }
-
-    public function renameSprintAction() {
-        $sprint = Sprint::getById($this->getParam('id'));
-        if($sprint->id_project != $this->getCurrentProjectId())
-            throw new AppControllerException(sprintf('You can rename sprint only from current selected projects'));
-        $sprint->name = $this->getParam('name');
-        $sprint->save();
-        $this->result = true;
-    }
-
     public function saveTaskAction() {
 
         $taskId = (int) $this->getParam('taskId');
@@ -64,7 +36,6 @@ class ProjectController extends AppController
             $task->id_project = $this->getCurrentProjectId();
         }
 
-        $task->id_sprint = $this->getCurrentSprintId();
         $task->id_story = $this->getParam('storyId');
         $task->body = $this->getParam('body');
         $task->estimation = (int) $this->getParam('estimation');
@@ -96,7 +67,7 @@ class ProjectController extends AppController
     public function addNewUserStoryAction() {
         $story = new Story;
         if($this->getParam('place') == 'sprint') {
-            $story->id_sprint = $this->getCurrentSprintId();
+            $story->active = true;
         }
         $story->id_project = $this->getCurrentProjectId();
         $story->save();
@@ -121,7 +92,7 @@ class ProjectController extends AppController
             throw new AppControllerException('Invalid project id for user story');
         } 
 
-        $story->id_sprint = null;
+        $story->active = false;
         $story->save();
         $this->result = true;
     }
@@ -133,7 +104,7 @@ class ProjectController extends AppController
             throw new AppControllerException('Invalid project id for user story');
         } 
 
-        $story->id_sprint = $this->getCurrentSprintId();
+        $story->active = true;
         $story->save();
         $this->result = true;
     }

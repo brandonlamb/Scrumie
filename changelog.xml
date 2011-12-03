@@ -233,4 +233,16 @@
         />
     </changeSet>
 
+    <changeSet id="18" author="nigro">
+        <dropColumn tableName="task" columnName="id_sprint"/>
+        <dropColumn tableName="story" columnName="id_sprint"/>
+        <dropTable tableName="sprint"/>
+    </changeSet>
+
+    <changeSet id="19" author="nigro">
+        <addColumn tableName="story">
+            <column name="active" type="bool"/>
+        </addColumn>
+    </changeSet>
+
 </databaseChangeLog>

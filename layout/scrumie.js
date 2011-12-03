@@ -143,52 +143,7 @@
             };
         }();
 
-        var Sprint = function() {
-            var add = function(name) {
-                if(! name) {
-                    alert('Sprint name can\'t be empty');
-                    return;
-                }
-
-                $.post(uri('Project','addNewSprint'), {'name': name}, function(data, status, Request) {
-                    if(data === true) {
-                        window.location.reload();
-                    } else {
-                        alert(data.error);
-                    }
-                });
-            };
-
-            var del = function(id) {
-                if (!confirm('Are you sure you want to delete this sprint?\n\nAll information connected with it will be permamently removed!')) {
-                    return;
-                }
-
-                $.post(uri('Project', 'deleteSprint'), {id: id}, function(data) {
-                    if(data === true) {
-                        location.href = uri('Board', 'project');
-                    }
-                });
-            };
-
-            var edit = function(id) {
-                var el = $('li[data-sprintId='+id+']');
-                el.find('span.href').attr('contenteditable', true);
-                el.find('span.href').focus();
-                el.find('span.href').blur(function() {
-                    $(this).attr('contenteditable', false);
-                    $(this).css('border', '0');
-                    $.post(uri('Project', 'renameSprint'), {id: id, name: $(this).html()});
-                    $(this).unbind('blur');
-                });
-            };
-
-            var select = function(id) {
-                var el = $('li[data-sprintId='+id+']').find('span');
-                if (el.attr('contenteditable') === 'false') {
-                    location.href = uri('Board', 'sprint') + '&id=' + id;
-                }
-            };
+        var Board = function() {
 
             var refreshSummaryPoints = function() {
                 var estimate = 0, done = 0, container, board;
@@ -214,10 +169,6 @@
             };
 
             return {
-                add: add,
-                del: del,
-                edit: edit,
-                select: select,
                 refreshSummaryPoints: refreshSummaryPoints
             };
         }();
@@ -341,7 +292,7 @@
                         $(this).css('top', 0);
                         $(this).css('left', 0);
                         save(this);
-                        Sprint.refreshSummaryPoints();
+                        Board.refreshSummaryPoints();
                     }
                 });
             };
@@ -382,7 +333,7 @@
                     done: task.find('input.done').val()
                 };
 
-                Scrumie.Sprint.refreshSummaryPoints();
+                Scrumie.Board.refreshSummaryPoints();
 
                 $.post(uri('Project', 'saveTask'), params, function(response) {
                     if(response) {
@@ -483,7 +434,7 @@
 
         return {
             Project: Project,
-            Sprint: Sprint,
+            Board: Board,
             Story: Story,
             Task: Task,
             login: login,

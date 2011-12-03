@@ -1,107 +1,9 @@
-<?php
-
-function prepareTask(Task $task, $project) {
-
-    if($task->estimation === null)
-        $task->estimation = 1;
-
-    if($task->done === null)
-        $task->done = 0;
-
-    if($task->body === null)
-        $task->body = 'Double click to edit...';
-
-    $owner = array('<option>Select owner...</option>');
-    foreach($project->users as $userProject) {
-        $user = $userProject->user;
-        $selected = ($task->owner == $user->login) ? 'selected="selected"' : '';
-        $owner[] = "<option $selected value='{$user->login}'>{$user->login}</option>";
-    }
-
-    $taskHelper = '
-        <div id="%s" class="task draggable">
-            <div class="body" style="background-color: %s" contenteditable="false">%s</div>
-            <div class="status">
-                <input title="Done" class="done noneditable" value="%s"/>/<input title="Estimation" class="estimation noneditable" value="%s"/>
-                <select title="Owner" name="owner" class="owner">%s</select>
-                <button data-color="#F79F81" class="color red noneditable"></button><button data-color="lightgreen" class="color green noneditable"></button><button data-color="lightblue" class="color blue noneditable"></button><button data-color="#FFFECB" class="color yellow noneditable"></button><button data-color="#ddd" class="color gray noneditable"></button>
-                <img class="delete_task" src="http://cdn1.iconfinder.com/data/icons/uidesignicons/delete.png" title="Delete task" />
-                <span class="confirm_delete"><em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button></span>
-                <span style="display: inline-block; width: 2px;"></span>
-            </div>
-        </div>';
-
-    return sprintf($taskHelper, $task->id, $task->color, $task->body, $task->done, $task->estimation, join('', $owner));
-}
-
-
-function prepareUserStory($story, $project) {
-    $storyHtml = '
-        <table class="user_story" data-storyid="%s">
-        <tbody>
-            <tr class="title">
-                <td colspan="4">
-                    <img class="icon detach" title="'.( ($story->id_sprint) ? 'Move to backlog' : 'Move to sprint').'" src="http://cdn3.iconfinder.com/data/icons/woothemesiconset/16/arrow_left.png"/>
-                    <img class="icon add_new_task" onclick="Scrumie.Task.add($(\'#newtask\').find(\'div.task\'), $(this).parent().parent().parent().find(\'tr.board\').find(\'td.todo\'))" src="http://cdn2.iconfinder.com/data/icons/basicset/plus_16.png">
-                    <img title="Delete user story" class="icon delete_user_story" onclick="Scrumie.Story.del($(this).parent().parent().parent().parent())" src="http://cdn2.iconfinder.com/data/icons/oxygen/16x16/actions/mail-delete.png"/>
-                    <span class="user_story confirm_delete"> <em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button> </span>
-                    <span class="name" ondblclick="Scrumie.Story.edit($(this).parent().parent().parent().parent())">%s</span>
-                </td>
-            </tr>
-            <tr class="points">
-                <td class="todo">'.$story->getTasks()->getTodo()->getDoneSum().'/'.($todoSum = $story->getTasks()->getTodo()->getEstimationSum()).'</td>
-                <td class="inProgress">'.$story->getTasks()->getInProgress()->getDoneSum().'/'.($inProgressSum = $todoSum + $story->getTasks()->getInProgress()->getEstimationSum()).'</td>
-                <td class="toVerify">'.$story->getTasks()->getToVerify()->getDoneSum().'/'.($toVerifySum = $inProgressSum + $story->getTasks()->getToVerify()->getEstimationSum()).'</td>
-                <td class="done">'.$story->getTasks()->getDone()->getDoneSum().'/'.($toVerifySum + $story->getTasks()->getDone()->getEstimationSum()).'</td>
-            </tr>
-            <tr class="board">
-                <td data-state="todo" class="todo droppable">%s</td>
-                <td data-state="inProgress" class="inProgress droppable">%s</td>
-                <td data-state="toVerify" class="toVerify droppable">%s</td>
-                <td data-state="done" class="done droppable">%s</td>
-            </tr>
-            <tr><td colspan="4" style="height: 10px; border: 0;"></td></tr>
-        </tbody>
-        </table>
-    ';
-
-    if(count($story->getTasks())) {
-        $todo = '';
-        foreach($story->getTasks()->getTodo() as $task) {
-            $todo .= prepareTask($task, $project);
-        }
-
-        $inProgress = '';
-        foreach($story->getTasks()->getInProgress() as $task) {
-            $inProgress .= prepareTask($task, $project);
-        }
-
-        $toVerify = '';
-        foreach($story->getTasks()->getToVerify() as $task) {
-            $toVerify .= prepareTask($task, $project);
-        }
-
-        $done = '';
-        foreach($story->getTasks()->getDone() as $task) {
-            $done .= prepareTask($task, $project);
-        }
-        return sprintf($storyHtml, $story->id, $story->name, $todo, $inProgress, $toVerify, $done);
-    }
-    else {
-        return sprintf($storyHtml, $story->id, $story->name, null, null, null, null);
-    }
-}
-?>
 <div id="tabs">
     <ul>
         <li><a href="#tabs-home"><img src="http://cdn1.iconfinder.com/data/icons/gnomeicontheme/16x16/actions/redhat-home.png"></a></li>
-        <?php if(isset($this->sprint)): ?>
-            <li><a href="#tabs-board"><?= $this->sprint->name; ?></a></li>
-        <?php endif ?>
         <?php if(isset($this->project)): ?>
+            <li><a href="#tabs-board">Board</a></li>
             <li><a href="#tabs-backlog">Backlog</a></li>
-        <?php endif ?>
-        <?php if(isset($this->sprint)): ?>
             <li><a href="#tabs-burndownchart">Burn down chart</a></li>
         <?php endif ?>
         <li><a id="logout">Logout</a></li>
@@ -118,28 +20,11 @@ function prepareUserStory($story, $project) {
                 <ol>
                 <?php 
                 foreach($this->user->projects as $userProject) {
-                    $project = $userProject->project;
+                    $project = $userProject->getProject();
                     $class = (isset($this->currentProjectId) && $project->id == $this->currentProjectId) ? 'selected' : '';
                     echo '<li data-projectId="'.$project->id.'" onclick="Scrumie.Project.select('.$project->id.')" class="projectName href '.$class.'">'.$project->name.'</li>';
                 }
                 ?>
-                </ol>
-            </div>
-            <div>
-                <h1>Sprints:</h1>
-                <input id="new-sprint-name" type="text" placeholder="sprint name">
-                <button title="Add new sprint" onclick="Scrumie.Sprint.add($(this).parent().find('input').val())">+</button>
-                <button title="Delete current sprint" onclick="Scrumie.Sprint.del($('li.sprint.selected').attr('data-sprintId'))">-</button>
-                <button title="Edit current sprint name" onclick="Scrumie.Sprint.edit($('li.sprint.selected').attr('data-sprintId'))">!</button>
-                <ol>
-                    <?php
-                    if(isset($this->project)) {
-                        foreach($this->project->sprints as $sprint) {
-                            $class = (isset($this->sprint) && $sprint->id == $this->sprint->id) ? 'selected' : '';
-                            echo "<li data-sprintId='{$sprint->id}' class='href sprint {$class}' onclick='Scrumie.Sprint.select({$sprint->id})'><span contenteditable='false'>{$sprint->name}</span></li>";
-                        }
-                    }
-                    ?>
                 </ol>
             </div>
             <div>
@@ -151,8 +36,8 @@ function prepareUserStory($story, $project) {
                 <?php
                 if($this->project) {
                     $contributors = array();
-                    foreach($this->project->users as $projectUser) {
-                        $user = $projectUser->user;
+                    foreach($this->project->getUsers() as $projectUser) {
+                        $user = $projectUser->getUser();
                         if($user->email) {
                             $contributors[] = '<a href="mailto:'.$user->email.'">'.$user->login.'</a>';
                         } else {
@@ -172,7 +57,7 @@ function prepareUserStory($story, $project) {
     <div id="tabs-backlog" class="tabContent">
         <div class="sortable" id="detached">
         <?php
-        foreach($this->project->getDetachedStories() as $story) {
+        foreach($this->project->getDetachedUserStories() as $story) {
             echo prepareUserStory($story, $project);
         }
         ?>
@@ -183,7 +68,7 @@ function prepareUserStory($story, $project) {
 
 
     <!-- SPRINT -->
-    <?php if(isset($this->sprint)): ?>
+    <?php if(isset($this->project)): ?>
     <div id="tabs-board" class="tabContent">
         <div id="story-container">
             <table class="user_story header">
@@ -194,7 +79,7 @@ function prepareUserStory($story, $project) {
                 <th>DONE<span class="summary done"><em></em>/<em></em></span></th>
             </tr>
             </table>
-            <?php foreach($this->sprint->getStories() as $story): ?>
+            <?php foreach($this->project->getActiveUserStories() as $story): ?>
                 <?= prepareUserStory($story, $project) ?>
             <?php endforeach ?>
         </div>
@@ -203,39 +88,39 @@ function prepareUserStory($story, $project) {
     <?php endif ?>
 
     <!-- BURN DOWN CHART -->
-    <?php if(isset($this->sprint)): ?>
+    <?php if(isset($this->project)): ?>
     <div id="tabs-burndownchart" class="tabContent">
-    <button onclick="location.href = location.href.replace(/&tab.*/, '') + '&tab=2';">Redraw</button>
-    <div style="width: 90%" id="burndownchart-container"></div>
-    <script>
-        $(document).ready(function() {
-           var chart;
-           chart = new Highcharts.Chart({
-              chart: {
-                 renderTo: 'burndownchart-container'
-              },
-              xAxis: {
-                categories: [<?= '"'.join('","', $this->sprint->tasks->getAllTasksUpdateDates('D/d/M')).'"'; ?>]
-              },
-              yAxis: {
-                 title: {text: 'Estimation points'},
-                 min: 0,
-                 max: <?= $this->sprint->tasks->getEstimationSum() ?>,
-              },
-              title: {
-                 text: 'Burndown chart'
-              },
-              tooltip: { formatter: function() { return this.y +' points' } },
-              series: [{
-                 name: 'Points left',
-                 data: [<?= join(",", $this->sprint->getEstimationForEachSprintDate()) ?>],
-                 marker: {
-                    radius: 4
-                 }
-              }]
-           });
-        });
-    </script>
+        <button onclick="location.href = location.href.replace(/&tab.*/, '') + '&tab=2';">Redraw</button>
+        <div style="width: 90%" id="burndownchart-container"></div>
+        <script>
+            $(document).ready(function() {
+               var chart;
+               chart = new Highcharts.Chart({
+                  chart: {
+                     renderTo: 'burndownchart-container'
+                  },
+                  xAxis: {
+                    categories: [<?= '"'.join('","', $this->project->getTasks()->getAllTasksUpdateDates('D/d/M')).'"'; ?>]
+                  },
+                  yAxis: {
+                     title: {text: 'Estimation points'},
+                     min: 0,
+                     max: <?= $this->project->getTasks()->getEstimationSum() ?>,
+                  },
+                  title: {
+                     text: 'Burndown chart'
+                  },
+                  tooltip: { formatter: function() { return this.y +' points' } },
+                  series: [{
+                     name: 'Points left',
+                     data: [<?= join(",", $this->project->getEstimationForEachDate()) ?>],
+                     marker: {
+                        radius: 4
+                     }
+                  }]
+               });
+            });
+        </script>
     </div>
     <?php endif ?>
 </div>
@@ -252,7 +137,7 @@ function prepareUserStory($story, $project) {
 
 <script>
 $(document).ready(function() {
-    Scrumie.Sprint.refreshSummaryPoints();
+    Scrumie.Board.refreshSummaryPoints();
 
     /**
      *  Events
@@ -339,3 +224,97 @@ $(document).ready(function() {
     }());
 });
 </script>
+
+<?php
+function prepareTask(Task $task, $project) {
+
+    if($task->estimation === null)
+        $task->estimation = 1;
+
+    if($task->done === null)
+        $task->done = 0;
+
+    if($task->body === null)
+        $task->body = 'Double click to edit...';
+
+    $owner = array('<option>Select owner...</option>');
+    foreach($project->getUsers() as $userProject) {
+        $user = $userProject->getUser();
+        $selected = ($task->owner == $user->login) ? 'selected="selected"' : '';
+        $owner[] = "<option $selected value='{$user->login}'>{$user->login}</option>";
+    }
+
+    $taskHelper = '
+        <div id="%s" class="task draggable">
+            <div class="body" style="background-color: %s" contenteditable="false">%s</div>
+            <div class="status">
+                <input title="Done" class="done noneditable" value="%s"/>/<input title="Estimation" class="estimation noneditable" value="%s"/>
+                <select title="Owner" name="owner" class="owner">%s</select>
+                <button data-color="#F79F81" class="color red noneditable"></button><button data-color="lightgreen" class="color green noneditable"></button><button data-color="lightblue" class="color blue noneditable"></button><button data-color="#FFFECB" class="color yellow noneditable"></button><button data-color="#ddd" class="color gray noneditable"></button>
+                <img class="delete_task" src="http://cdn1.iconfinder.com/data/icons/uidesignicons/delete.png" title="Delete task" />
+                <span class="confirm_delete"><em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button></span>
+                <span style="display: inline-block; width: 2px;"></span>
+            </div>
+        </div>';
+
+    return sprintf($taskHelper, $task->id, $task->color, $task->body, $task->done, $task->estimation, join('', $owner));
+}
+
+
+function prepareUserStory($story, $project) {
+    $storyHtml = '
+        <table class="user_story" data-storyid="%s">
+        <tbody>
+            <tr class="title">
+                <td colspan="4">
+                    <img class="icon detach" title="'.( ($story->active) ? 'Move to backlog' : 'Move to board').'" src="http://cdn3.iconfinder.com/data/icons/woothemesiconset/16/arrow_left.png"/>
+                    <img class="icon add_new_task" onclick="Scrumie.Task.add($(\'#newtask\').find(\'div.task\'), $(this).parent().parent().parent().find(\'tr.board\').find(\'td.todo\'))" src="http://cdn2.iconfinder.com/data/icons/basicset/plus_16.png">
+                    <img title="Delete user story" class="icon delete_user_story" onclick="Scrumie.Story.del($(this).parent().parent().parent().parent())" src="http://cdn2.iconfinder.com/data/icons/oxygen/16x16/actions/mail-delete.png"/>
+                    <span class="user_story confirm_delete"> <em>Are you sure?:</em><button class="yes">Yes</button><button class="cancel">Cancel</button> </span>
+                    <span class="name" ondblclick="Scrumie.Story.edit($(this).parent().parent().parent().parent())">%s</span>
+                </td>
+            </tr>
+            <tr class="points">
+                <td class="todo">'.$story->getTasks()->getTodo()->getDoneSum().'/'.($todoSum = $story->getTasks()->getTodo()->getEstimationSum()).'</td>
+                <td class="inProgress">'.$story->getTasks()->getInProgress()->getDoneSum().'/'.($inProgressSum = $todoSum + $story->getTasks()->getInProgress()->getEstimationSum()).'</td>
+                <td class="toVerify">'.$story->getTasks()->getToVerify()->getDoneSum().'/'.($toVerifySum = $inProgressSum + $story->getTasks()->getToVerify()->getEstimationSum()).'</td>
+                <td class="done">'.$story->getTasks()->getDone()->getDoneSum().'/'.($toVerifySum + $story->getTasks()->getDone()->getEstimationSum()).'</td>
+            </tr>
+            <tr class="board">
+                <td data-state="todo" class="todo droppable">%s</td>
+                <td data-state="inProgress" class="inProgress droppable">%s</td>
+                <td data-state="toVerify" class="toVerify droppable">%s</td>
+                <td data-state="done" class="done droppable">%s</td>
+            </tr>
+            <tr><td colspan="4" style="height: 10px; border: 0;"></td></tr>
+        </tbody>
+        </table>
+    ';
+
+    if(count($story->getTasks())) {
+        $todo = '';
+        foreach($story->getTasks()->getTodo() as $task) {
+            $todo .= prepareTask($task, $project);
+        }
+
+        $inProgress = '';
+        foreach($story->getTasks()->getInProgress() as $task) {
+            $inProgress .= prepareTask($task, $project);
+        }
+
+        $toVerify = '';
+        foreach($story->getTasks()->getToVerify() as $task) {
+            $toVerify .= prepareTask($task, $project);
+        }
+
+        $done = '';
+        foreach($story->getTasks()->getDone() as $task) {
+            $done .= prepareTask($task, $project);
+        }
+        return sprintf($storyHtml, $story->id, $story->name, $todo, $inProgress, $toVerify, $done);
+    }
+    else {
+        return sprintf($storyHtml, $story->id, $story->name, null, null, null, null);
+    }
+}
+?>

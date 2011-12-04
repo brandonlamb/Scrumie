@@ -90,7 +90,7 @@
     <!-- BURN DOWN CHART -->
     <?php if(isset($this->project)): ?>
     <div id="tabs-burndownchart" class="tabContent">
-        <button onclick="location.href = location.href.replace(/&tab.*/, '') + '&tab=2';">Redraw</button>
+        <button onclick="location.reload()">Redraw</button>
         <div style="width: 90%" id="burndownchart-container"></div>
         <script>
             $(document).ready(function() {
@@ -150,50 +150,56 @@ $(document).ready(function() {
         $('#story-container img.detach').live('click', function(event) {
             $(this).attr('title', 'Move to sprint');
             Scrumie.Story.detach($(this).parent().parent().parent().parent());
-        })
+        });
 
         $('#detached img.detach').live('click', function(event) {
             $(this).attr('title', 'Move to sprint');
             Scrumie.Story.attach($(this).parent().parent().parent().parent());
-        })
+        });
 
         $('img.delete_task').live('click', function(event) {
             event.stopPropagation();
             Scrumie.Task.del($(this).parent().parent(), function() {
                 Scrumie.Sprint.refreshSummaryPoints();
             });
-        })
+        });
 
         $('input.estimation').live('click', function(event) {
             event.stopPropagation();
+        });
+
+        $('input.estimation').live('change', function(event) {
             Scrumie.Task.save($(this).parent().parent()); 
             Scrumie.Story.recalculate($(this).parent().parent().parent().parent());
-        })
+        });
 
         $('input.estimation').live('keyup', function(event) {
             event.stopPropagation();
             Scrumie.Task.changeProgress(event, this);
-        })
+        });
 
         $('input.done').live('click', function(event) {
             event.stopPropagation();
+        });
+
+        $('input.done').live('change', function(event) {
             Scrumie.Task.save($(this).parent().parent()); 
             Scrumie.Story.recalculate($(this).parent().parent().parent().parent());
-        })
-
-        $('select.owner').live('change', function(event) {
-            event.stopPropagation();
-            Scrumie.Task.save($(this).parent().parent());
-        })
-
-        $('select.owner').live('click', function(event) {
-            event.stopPropagation();
-        })
+        });
 
         $('input.done').live('keyup', function(event) {
             event.stopPropagation();
             Scrumie.Task.changeProgress(event, this);
-        })
+        });
+
+        $('select.owner').live('change', function(event) {
+            event.stopPropagation();
+            Scrumie.Task.save($(this).parent().parent());
+        });
+
+        $('select.owner').live('click', function(event) {
+            event.stopPropagation();
+        });
 
         $('#tabs-backlog button.add_new_user_story').click(function(event) {
             var story = $('#newuserstory').find('table').clone();

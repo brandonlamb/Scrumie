@@ -1,4 +1,3 @@
-<?php exit; ?>
 database.driver=postgresql
 database.name=scrumie
 database.host=localhost

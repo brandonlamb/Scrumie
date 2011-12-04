@@ -4,3 +4,8 @@ RewriteEngine On
 
 # Disable all magic quoting.
 php_flag magic_quotes_gpc Off
+
+<FilesMatch "\.(ini|dist)$">
+Order Allow,Deny
+Deny from all
+</FilesMatch>

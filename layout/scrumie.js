@@ -26,6 +26,53 @@
         });
 
         /**
+         * $.cookie('set', {name: '', value: '', expires: 3600, path: '/', domain: '', secure: null});
+         * $.cookie('get', 'name');
+         * $.cookie('delete', 'name');
+         */
+        $.extend({ 
+            cookie: function(action, args) {
+                function _set (args) {
+                    var Cookie = escape(args.name) + '=' + escape(args.value);
+                    Cookie += (args.expires ? '; EXPIRES=' + args.expires.toGMTString() : '');
+                    Cookie += (args.path ? '; PATH=' + args.path : '');
+                    Cookie += (args.domain ? '; DOMAIN=' + args.domain : '');
+                    Cookie += (args.secure ? '; SECURE' : '');
+                    document.cookie = Cookie;
+                    return true;
+                }
+                function _get (name) {
+                    var value, arr, arr2;
+                    arr = document.cookie.split((escape(name) + '='));
+                    if (document.cookie) {
+                        if (arr.length >= 2) {
+                            arr2 = arr[1].split(';');
+                            value  = unescape(arr2[0]);
+                        }
+                    }
+                    return value;
+                }
+                function _delete (name) {
+                    var value = _get(name);
+                    if (value) { 
+                        _set(name,value,new Date(1));
+                    }
+                    return value;
+                }
+
+                if(action === 'set') {
+                    return _set(args);
+                }
+                else if(action === 'get') {
+                    return _get(args);
+                }
+                else if(action === 'delete') {
+                    return _delete(args);
+                }
+            }
+        });
+
+        /**
          * .disableTextSelect - Disable Text Select Plugin
          *
          * Version: 1.1
@@ -451,14 +498,15 @@
             cache: false
         });
 
-        $( "#tabs" ).tabs();
+        $( "#tabs" ).tabs({
+            select: function(event, ui) {
+                $.cookie('set', {name: 'tab', value: ui.index});
+            }
+        });
 
-        var tabIndex = parseInt($.getUrlVar('tab'),10);
+        var tabIndex = $.cookie('get', 'tab');
         if(tabIndex) {
             $( "#tabs" ).tabs({ selected: parseInt(tabIndex,10) });
-        }
-        else if($.getUrlVar('sprint')) {
-            $( "#tabs" ).tabs({ selected: 1 });
         }
 
         setInterval( function() {$.get('?controller=Index&action=keepAlive'); }, 100000);
@@ -508,7 +556,6 @@
 
         Scrumie.droppable();
         Scrumie.draggable();
-
     });
 
     window.Scrumie = Scrumie;

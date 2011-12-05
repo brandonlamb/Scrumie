@@ -245,4 +245,10 @@
         </addColumn>
     </changeSet>
 
+    <changeSet id="20" author="nigro">
+        <update tableName="task">
+            <column name="state" value="toVerify"/>
+            <where>state='commited'</where>
+        </update>
+    </changeSet>
 </databaseChangeLog>

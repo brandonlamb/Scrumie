@@ -225,7 +225,7 @@
                 $.post(uri('Project', 'addNewUserStory'), {place: place}, function(data) {
                     if(data) {
                         newstory.attr('data-storyid', data);
-                        droppable();
+                        droppable(newstory.find('tr.board').find('td.droppable'));
                         callback();
                     }
                 });
@@ -452,8 +452,15 @@
             location.href = uri('User', 'logout');
         };
 
-        var droppable = function() {
-            $(".droppable").droppable({
+        var droppable = function(selector) {
+            var placeholder;
+
+            if(typeof selector !== 'undefined') {
+                placeholder = $(selector);
+            } else {
+                placeholder = $(".droppable");
+            }
+            placeholder.droppable({
                 drop: function(event,ui) {
                     ui.helper.appendTo(this);
                     $(this).removeClass('over');

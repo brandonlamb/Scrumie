@@ -240,16 +240,13 @@
     </changeSet>
 
     <changeSet id="pre-18" author="nigro">
-        <comment>Create one user story for each project</comment>
+        <comment>Create active and backlog user story for each project and assign task to it</comment>
         <sql>
-            INSERT INTO story (name, id_project, active) SELECT 'All tasks ware assigned to one user story after migartion', id, true FROM project;
-        </sql>
-    </changeSet>
-
-    <changeSet id="post-pre-18" author="nigro">
-        <comment>Assign all task to proper user story for their project id</comment>
-        <sql>
-            UPDATE task as t SET id_story = (SELECT id FROM story as s where s.id_project = t.id_project);
+            INSERT INTO story (name, id_project, active) SELECT 'All task from active sprints', id, true FROM project;
+            UPDATE task as t SET id_story = (SELECT id FROM story as s where s.id_project = t.id_project) WHERE t.state != 'detached';
+            INSERT INTO story (name, id_project, active) SELECT 'All detached task', id, false FROM project;
+            UPDATE task as t SET id_story = (SELECT id FROM story as s where s.id_project = t.id_project AND s.name ='All detached task') WHERE t.state = 'detached';
+            UPDATE task SET state = 'todo' WHERE state = 'detached';
         </sql>
     </changeSet>
 
@@ -260,9 +257,8 @@
     </changeSet>
 
     <changeSet id="20" author="nigro">
-        <update tableName="task">
-            <column name="state" value="toVerify"/>
-            <where>state='commited'</where>
-        </update>
+        <sql>
+            UPDATE task SET state = 'toVerify' WHERE state IN ('readyForTest', 'commited');
+        </sql>
     </changeSet>
 </databaseChangeLog>

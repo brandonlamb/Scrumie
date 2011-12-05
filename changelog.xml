@@ -182,7 +182,7 @@
             <column name="id_sprint" type="int">
                 <constraints nullable="false"/>
            </column>
-            <column name="name" type="varchar(64)">
+            <column name="name" type="varchar(260)">
                 <constraints nullable="false"/>
             </column>
         </createTable>
@@ -233,16 +233,30 @@
         />
     </changeSet>
 
-    <changeSet id="18" author="nigro">
-        <dropColumn tableName="task" columnName="id_sprint"/>
-        <dropColumn tableName="story" columnName="id_sprint"/>
-        <dropTable tableName="sprint"/>
-    </changeSet>
-
     <changeSet id="19" author="nigro">
         <addColumn tableName="story">
             <column name="active" type="bool"/>
         </addColumn>
+    </changeSet>
+
+    <changeSet id="pre-18" author="nigro">
+        <comment>Create one user story for each project</comment>
+        <sql>
+            INSERT INTO story (name, id_project, active) SELECT 'All tasks ware assigned to one user story after migartion', id, true FROM project;
+        </sql>
+    </changeSet>
+
+    <changeSet id="post-pre-18" author="nigro">
+        <comment>Assign all task to proper user story for their project id</comment>
+        <sql>
+            UPDATE task as t SET id_story = (SELECT id FROM story as s where s.id_project = t.id_project);
+        </sql>
+    </changeSet>
+
+    <changeSet id="18" author="nigro">
+        <dropColumn tableName="task" columnName="id_sprint"/>
+        <dropColumn tableName="story" columnName="id_sprint"/>
+        <dropTable tableName="sprint"/>
     </changeSet>
 
     <changeSet id="20" author="nigro">
